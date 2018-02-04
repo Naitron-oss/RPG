@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#background-map {
+  background: blue;
+  z-index: 1;
+}
+
+#sprite-map {
+  background: transparent;
+  z-index: 10;
+}
