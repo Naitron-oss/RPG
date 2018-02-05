@@ -27,11 +27,21 @@ Implement smooth walking until keyup
 -~- COMPLETE
 
 Step 6:
+Fix speed issue where hold down key results in sprint
+//arrow keys auto fire after period of time
+//if i can keep calling move function while key is down
+//and not stop until key up, that should fix
+//or track movement with true/false
+-~-COMPLETE
+
+Step 7:
 Correctly get background frames to switch
 //Need to have a map moveSpeed + link.moveSpeed so they move together
+//Need to start/stop background frames movement
 
 Step ??:
 Prevent Link from moving diagonally
+
 
 Step ??:
 Make map key where Link and enemies can/can't be on
