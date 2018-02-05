@@ -66,8 +66,28 @@ var link = {
   pngHeight: 16,
   xMove: 0,
   yMove: 0,
+  moveSpeed: 13,
   spriteWidth: 37.5,
-  spriteHeight: 40
+  spriteHeight: 40,
+  moveDownInterval: null,
+  moveUpInterval: null,
+  moveLeftInterval: null,
+  moveRightInterval: null,
+
+  moveStop: function(event) {
+    if(event.keyCode === 38) {
+      clearInterval(link.moveUpInterval);
+    };
+    if(event.keyCode === 40) {
+      clearInterval(link.moveDownInterval);
+    };
+    if(event.keyCode === 37) {
+      clearInterval(link.moveLeftInterval);
+    };
+    if(event.keyCode === 39) {
+      clearInterval(link.moveRightInterval);
+    };
+  }
 };
 
 
@@ -75,7 +95,8 @@ var link = {
 var movePlayer = function(event) {
   //Up
   if (event.keyCode === 38) {
-    link.yMove -= 13;
+    link.moveUpInterval = setInterval(function(event) {
+    link.yMove -= link.moveSpeed;
     link.xFrame = 61;
     if (link.upFrame === 0) {
       link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
@@ -84,24 +105,28 @@ var movePlayer = function(event) {
       link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
       link.upFrame--;
     };
+    }, 50);
+    link.moveUpInterval();
   }
   //Down
   if (event.keyCode === 40) {
-    setInterval(function(event) {
-      link.yMove += 13;
-      link.xFrame = 0;
-      if (link.downFrame === 0) {
-        link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
-        link.downFrame++;
-      } else {
-        link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
-        link.downFrame--;
-      };
+    link.moveDownInterval = setInterval(function(event) {
+    link.yMove += link.moveSpeed;
+    link.xFrame = 0;
+    if (link.downFrame === 0) {
+      link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
+      link.downFrame++;
+    } else {
+      link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
+      link.downFrame--;
+    };
     }, 50);
+    link.moveDownInterval();
   }
   //Left
   if (event.keyCode === 37) {
-    link.xMove -= 13;
+    link.moveLeftInterval = setInterval(function(event) {
+    link.xMove -= link.moveSpeed;
     link.xFrame = 29;
     if (link.leftFrame === 0) {
       link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
@@ -110,10 +135,13 @@ var movePlayer = function(event) {
       link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
       link.leftFrame--;
     };
+    }, 50);
+    link.moveLeftInterval();
   }
   //Right
   if (event.keyCode === 39) {
-    link.xMove += 13;
+    link.moveRightInterval = setInterval(function(event) {
+    link.xMove += link.moveSpeed;
     link.xFrame = 90;
     if (link.rightFrame === 0) {
       link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
@@ -122,6 +150,8 @@ var movePlayer = function(event) {
       link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
       link.rightFrame--;
     };
+    }, 50);
+    link.moveRightInterval();
   }
 };
 
@@ -153,5 +183,5 @@ var animationLoop = function() {
 document.addEventListener('DOMContentLoaded', function(event) {
   setInterval(animationLoop, 50);
   window.addEventListener('keydown', movePlayer);
-  // window.addEventListener('keyup', stopMoving);
+  window.addEventListener('keyup', link.moveStop);
 });
