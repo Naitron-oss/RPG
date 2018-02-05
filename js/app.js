@@ -82,23 +82,90 @@ var link = {
   moveLeftInterval: null,  //interval for left movement
   moveRightAnimation: null,  //interval for right movement
 
+  moveUp: function() {
+      link.yMove -= link.moveSpeed;
+      link.xFrame = 61;
+      link.yFrame = 0;
+      if (link.upFrame < (link.frameSpeed / 2)){
+        link.yFrame = 30;
+        link.upFrame++;
+      } else if(link.upFrame <= link.frameSpeed) {
+        link.yFrame = 0;
+        link.upFrame++;
+      } else {
+        link.upFrame = 0;
+      };
+    link.moveUpAnimation = window.requestAnimationFrame(link.moveUp);
+  },
+
+  moveDown: function() {
+      link.yMove += link.moveSpeed;
+      link.xFrame = 0;
+      link.yFrame = 0;
+      if (link.downFrame < (link.frameSpeed / 2)){
+        link.yFrame = 30;
+        link.downFrame++;
+      } else if(link.downFrame <= link.frameSpeed) {
+        link.yFrame = 0;
+        link.downFrame++;
+      } else {
+        link.downFrame = 0;
+      };
+    link.moveDownAnimation = window.requestAnimationFrame(link.moveDown);
+  },
+
+  moveLeft: function() {
+      link.xMove -= link.moveSpeed;
+      link.xFrame = 29;
+      link.yFrame = 31;
+      if (link.leftFrame < (link.frameSpeed * .5)){
+        link.yFrame = 0;
+        link.leftFrame++;
+      } else if(link.leftFrame <= link.frameSpeed) {
+        link.yFrame = 31;
+        link.leftFrame++;
+      } else {
+        link.leftFrame = 0;
+      };
+    link.moveLeftAnimation = window.requestAnimationFrame(link.moveLeft);
+  },
+
+  moveRight: function() {
+      link.xMove += link.moveSpeed;
+      link.xFrame = 90;
+      link.yFrame = 0;
+      if (link.rightFrame < (link.frameSpeed / 2)){
+        link.yFrame = 31;
+        link.rightFrame++;
+      } else if(link.rightFrame <= link.frameSpeed) {
+        link.yFrame = 0;
+        link.rightFrame++;
+      } else {
+        link.rightFrame = 0;
+      };
+    link.moveRightAnimation = window.requestAnimationFrame(link.moveRight);
+  },
+
   moveStop: function(event) {
     if(event.keyCode === 38) {
-      clearInterval(link.moveUpInterval);
+      window.cancelAnimationFrame(link.moveUpAnimation);
       link.isMovingUp = false;
+      link.yFrame = 30;
     };
     if(event.keyCode === 40) {
-      clearInterval(link.moveDownInterval);
+      window.cancelAnimationFrame(link.moveDownAnimation);
       link.isMovingDown = false;
+      link.yFrame = 0;
     };
     if(event.keyCode === 37) {
-      clearInterval(link.moveLeftInterval);
+      window.cancelAnimationFrame(link.moveLeftAnimation);
       link.isMovingLeft = false;
+      link.yFrame = 0;
     };
     if(event.keyCode === 39) {
-      // clearInterval(link.moveRightInterval);
       window.cancelAnimationFrame(link.moveRightAnimation);
       link.isMovingRight = false;
+      link.yFrame = 31;
     };
   }
 };
@@ -124,138 +191,37 @@ var stopMoveBackgroundLeft = function() {
 };
 
 
-
-
-
-var foo = function() {
-    link.xMove += link.moveSpeed;
-    link.xFrame = 90;
-    link.yFrame = 0;
-    if (link.rightFrame < (link.frameSpeed / 2)){
-      link.yFrame = 30;
-      link.rightFrame++;
-    } else if(link.rightFrame <= link.frameSpeed) {
-      link.yFrame = 0;
-      link.rightFrame++;
-    } else {
-      link.rightFrame = 0;
-    };
-      // if (link.rightFrame < (link.frameSpeed / 2)) {
-      //   console.log('in if??');
-      //     link.yFrame === 0 && link.rightFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
-      //   link.rightFrame++;
-      // } else if (link.rightFrame <= link.frameSpeed) {
-      //   console.log('in else??');
-      //   link.yFrame === 30 && link.rightFrame === link.frameSpeed ? link.yFrame -= 30 : link.yFrame += 30;
-      //   link.rightFrame++;
-      // } else {
-      //   link.rightFrame = 0;
-      // }
-//     };
-  link.moveRightAnimation = window.requestAnimationFrame(foo);
-// };
-};
-
-
-
-
-
 //Player move Function and Interval
 var movePlayer = function(event) {
   //Up
   if (event.keyCode === 38) {
-    if (link.isMovingUp === false) {
-      link.isMovingUp = true;
-      link.moveUpInterval = setInterval(function(event) {
-      link.yMove -= link.moveSpeed;
-      link.xFrame = 61;
-      if (link.upFrame === 0) {
-        link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
-        link.upFrame++;
-      } else {
-        link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
-        link.upFrame--;
+    if (!link.isMovingUp) {
+        window.requestAnimationFrame(link.moveUp);
+        link.isMovingUp = true;
       };
-      }, 50);
-    };
   }
   //Down
   if (event.keyCode === 40) {
-    if (link.isMovingDown === false) {
-      link.isMovingDown = true;
-      link.moveDownInterval = setInterval(function(event) {
-      link.yMove += link.moveSpeed;
-      link.xFrame = 0;
-      if (link.downFrame === 0) {
-        link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
-        link.downFrame++;
-      } else {
-        link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
-        link.downFrame--;
+    if (!link.isMovingDown) {
+        window.requestAnimationFrame(link.moveDown);
+        link.isMovingDown = true;
       };
-      }, 50);
-    };
   }
   //Left
   if (event.keyCode === 37) {
-    if (link.isMovingLeft === false) {
-      link.isMovingLeft = true;
-      link.moveLeftInterval = setInterval(function(event) {
-        if (link.xMove < -10) {
-          moveBackgroundLeft();
-        } else if (link.xMove > 100) {
-          // clearInterval(background.moveMapFrame);
-          stopMoveBackgroundLeft();
-        };
-      link.xMove -= link.moveSpeed;
-      link.xFrame = 29;
-      if (link.leftFrame === 0) {
-        link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
-        link.leftFrame++;
-      } else {
-        link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
-        link.leftFrame--;
+    if (!link.isMovingLeft) {
+        window.requestAnimationFrame(link.moveLeft);
+        link.isMovingLeft = true;
       };
-      }, 50);
-    };
   }
   //Right
   if (event.keyCode === 39) {
     if (!link.isMovingRight) {
-    // while (link.isMovingRight) {
-    //
-    //   link.moveRightAnimation = function() {
-    // //     if (link.isMovingRight) {
-    //       link.xMove += link.moveSpeed;
-    //       link.xFrame = 90;
-    // //       if (link.rightFrame === 0) {
-    // //         link.yFrame === 0 ? link.yFrame += 30 : link.yFrame -= 30;
-    // //         link.rightFrame++;
-    // //       } else {
-    // //         link.yFrame === 30 ? link.yFrame -= 30 : link.yFrame += 30;
-    // //         link.rightFrame--;
-    // //       };
-    //     };
-    //   };
-        // requestAnimationFrame(link.moveRightAnimation)
-        window.requestAnimationFrame(foo);
+        window.requestAnimationFrame(link.moveRight);
         link.isMovingRight = true;
-
       };
-
     }
-
-    // console.log('yo');
-    // };
-
-
-  // }
 };
-
-// if (background.mapCounter >= 17) {
-//   clearInterval(background.moveMapFrame);
-// };
-
 
 
 //Animation Loop for player and enemies
