@@ -35,9 +35,14 @@ Fix speed issue where hold down key results in sprint
 -~-COMPLETE
 
 Step 7:
-Correctly get background frames to switch
+Get background frames to switch
 //Need to have a map moveSpeed + link.moveSpeed so they move together
 //Need to start/stop background frames movement
+-~-COMPLETE
+
+Step ??:
+Need to fix background frame to switch correctly on all screens
+Also need to switch smoothly
 
 Step ??:
 Prevent Link from moving diagonally
@@ -46,7 +51,9 @@ Prevent Link from moving diagonally
 Step ??:
 Make map key where Link and enemies can/can't be on
 Also include tiles that trigger map/dungeon frame moves
+//Each map frame is 256x176 ratio
 //Each map frame has 16 tiles on x axis, and 11 tiles on y axis
+//Each tile is 16x16
 
 Step ??:
 How do you win????

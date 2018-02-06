@@ -1,79 +1,72 @@
 
 //Defining backgroundMap canvas
-
-// in JQuery
-// var backgroundMap = $('#background-map');
-// var ctxBackgroundMap = backgroundMap[0].getContext('2d');
-
-// in Vanilla JS
 var backgroundMap = document.getElementById('background-map');
 var ctxBackgroundMap = backgroundMap.getContext('2d');
 var backgroundImage = new Image();
 backgroundImage.src = '../images/overworld_map.png';
-backgroundMap.width = window.innerWidth;
-backgroundMap.height = window.innerHeight;
+backgroundMap.width = 512;
+backgroundMap.height = 352;
 var background = {
   image: backgroundImage,
   xFrame: 2816,  //x axis start of current map frame (from src img)
   yFrame: 704,  //y axis start of current map frame (from src img)
-  upFrame: 0,  //not sure if will be used
-  downFrame: 0,  //not sure if will be used
-  leftFrame: 0,  //not sure if will be used
-  rightFrame: 0,  //not sure if will be used
-  moveSpeed: 4,  //not sure if will be used
-  mapCounter: 0,  //not sure if will be used - count map frame slides ininterval function
+  moveSpeed: 4,  //speed at which map moves frames
+  mapCounter: 0,  //count map frame slides for map move function
   pngWidth: 256,  //map frame width from src img
   pngHeight: 176,  //map frame height from src img
-  xMove: 0,  //not sure if will be used
-  yMove: 0,  //not sure if will be used
   mapWidth: backgroundMap.width,  //how wide the background will be on canvas
   mapHeight: backgroundMap.height,  //how tall the background will be on canvas
-  moveMapFrameRightAnimation: null,
+  moveMapFrameAnimation: null,
+  mapMoving: false,
 
   moveMapFrameUp: function() {
     if (background.mapCounter < 64) {
-      link.yMove += (background.moveSpeed * 2.85);
+      link.yMove += (background.moveSpeed * 1.25);
       background.yFrame -= (background.moveSpeed * 0.6875);
-      background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameUp);
+      background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameUp);
       background.mapCounter++
     } else {
       background.mapCounter = 0;
-      link.yMove = 735;
+      background.mapMoving = false;
+      link.yMove = backgroundMap.height - link.spriteHeight;
     };
   },
 
   moveMapFrameDown: function() {
     if (background.mapCounter < 64) {
-      link.yMove -= (background.moveSpeed * 2.85);
+      link.yMove -= (background.moveSpeed * 1.25);
       background.yFrame += (background.moveSpeed * 0.6875);
-      background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameDown);
+      background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameDown);
       background.mapCounter++
     } else {
       background.mapCounter = 0;
+      background.mapMoving = false;
       link.yMove = 0;
     };
   },
 
   moveMapFrameLeft:function() {
     if (background.mapCounter < 64) {
-      link.xMove += (background.moveSpeed * 2.25);
+      link.xMove += (background.moveSpeed * 1.85);
       background.xFrame -= background.moveSpeed;
-      background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameLeft);
+      background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameLeft);
       background.mapCounter++
     } else {
       background.mapCounter = 0;
-      link.xMove = 560;
+      background.mapMoving = false;
+      link.xMove = backgroundMap.width - link.spriteWidth;
     };
   },
 
   moveMapFrameRight: function() {
     if (background.mapCounter < 64) {
-      link.xMove -= (background.moveSpeed * 2.25);
+      link.xMove -= (background.moveSpeed * 1.85);
       background.xFrame += background.moveSpeed;
-      background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameRight);
+      background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameRight);
       background.mapCounter++
     } else {
       background.mapCounter = 0;
+      background.mapMoving = false;
       link.xMove = 0;
     };
   }
@@ -82,27 +75,44 @@ var background = {
 
 //Defining spriteMap canvas
 
-// in JQuery
-// var spriteMap = $('#sprite-map');
-// var ctxSpriteMap = spriteMap[0].getContext('2d');
-
-// in Vanilla JS
 var spriteMap = document.getElementById('sprite-map');
 var ctxSpriteMap = spriteMap.getContext('2d');
-spriteMap.width = window.innerWidth;
-spriteMap.height = window.innerHeight;
+spriteMap.width = 512;
+spriteMap.height = 352;
+
+
+//Random Number Generators
+var rNG = function() {
+  return Math.random();
+};
+
+// var coinFlip = function() {
+//   rNG < 0.5 ? return 0 : return 1;
+// };
 
 
 //Define character images
 var linkPng = new Image();
 linkPng.src = '../images/link-spritesheet.png';
 
+var tektitePngUp = new Image();
+tektitePngUp.src = '../images/tektite_up.png';
+var tektitePngDown = new Image();
+tektitePngDown.src = '../images/tektite_down.png';
+
 
 //Define characters
 var tektite = {
-  x: 75,
-  y: 75,
-  color: 'red'
+  imageUp: tektitePngUp,
+  imageDown: tektitePngDown,
+  xFrame: 0,  //x starting point of src img for sprite frame
+  yFrame: 0,  //y starting point of src img for sprite frame
+  pngWidth: 16,  //width of src img sprite size
+  pngHeight: 15,  //height of src img sprite size
+  spriteWidth: 37.5,  //width of sprite on canvas
+  spriteHeight: 40,  //height of sprite on canvas
+  xMove: 0,  //x point of link on canvas
+  yMove: 0  //y point of link on canvas
 };
 
 var link = {
@@ -115,26 +125,30 @@ var link = {
   rightFrame: 0,  //placeholder for frame iteration
   pngWidth: 15,  //width of src img sprite size
   pngHeight: 16,  //height of src img sprite size
+  spriteWidth: 31.875,  //width of sprite on canvas
+  spriteHeight: 34,  //height of sprite on canvas
   xMove: 0,  //x point of link on canvas
   yMove: 0,  //y point of link on canvas
   moveSpeed: 3,  //number of px moved per interval
-  frameSpeed: 14,
+  frameSpeed: 14,  //number to calculate frame switch rate
   isMovingUp: false, //tracks to see if moving Up
   isMovingDown: false, //tracks to see if moving Down
   isMovingLeft: false, //tracks to see if moving Left
   isMovingRight: false, //tracks to see if moving Right
-  spriteWidth: 37.5,  //width of sprite on canvas
-  spriteHeight: 40,  //height of sprite on canvas
-  moveDownAnimation: null,  //interval for down movement
-  moveUpAnimation: null,  //interval for up movement
-  moveLeftAnimation: null,  //interval for left movement
-  moveRightAnimation: null,  //interval for right movement
-  upMapMove: -5, //y px where link causes map to move up
-  downMapMove: 735, //y px where link causes map to move down
-  leftMapMove: -5, //x px where link causes map to move left
-  rightMapMove: 560, //x px where link causes map to move right
+  moveDownAnimation: null,  //function for down movement
+  moveUpAnimation: null,  //function for up movement
+  moveLeftAnimation: null,  //function for left movement
+  moveRightAnimation: null,  //function for right movement
+  upMapMove: 0, //y px where link causes map to move up
+  downMapMove: backgroundMap.height - 34, //y px where link causes map to move down
+  leftMapMove: 0, //x px where link causes map to move left
+  rightMapMove: backgroundMap.width - 32, //x px where link causes map to move right
 
   moveUp: function() {
+    if (link.yMove <= link.upMapMove) {
+      background.mapMoving = true;
+      window.requestAnimationFrame(background.moveMapFrameUp);
+    } else if (!background.mapMoving) {
       link.yMove -= link.moveSpeed;
       link.xFrame = 61;
       link.yFrame = 0;
@@ -147,26 +161,36 @@ var link = {
       } else {
         link.upFrame = 0;
       };
+    };
     link.moveUpAnimation = window.requestAnimationFrame(link.moveUp);
   },
 
   moveDown: function() {
-      link.yMove += link.moveSpeed;
-      link.xFrame = 0;
-      link.yFrame = 0;
-      if (link.downFrame < (link.frameSpeed / 2)){
-        link.yFrame = 30;
-        link.downFrame++;
-      } else if(link.downFrame <= link.frameSpeed) {
+      if (link.yMove >= link.downMapMove) {
+        background.mapMoving = true;
+        window.requestAnimationFrame(background.moveMapFrameDown);
+      } else if (!background.mapMoving) {
+        link.yMove += link.moveSpeed;
+        link.xFrame = 0;
         link.yFrame = 0;
-        link.downFrame++;
-      } else {
-        link.downFrame = 0;
+        if (link.downFrame < (link.frameSpeed / 2)){
+          link.yFrame = 30;
+          link.downFrame++;
+        } else if(link.downFrame <= link.frameSpeed) {
+          link.yFrame = 0;
+          link.downFrame++;
+        } else {
+          link.downFrame = 0;
       };
+    };
     link.moveDownAnimation = window.requestAnimationFrame(link.moveDown);
   },
 
   moveLeft: function() {
+    if (link.xMove <= link.leftMapMove) {
+      background.mapMoving = true;
+      window.requestAnimationFrame(background.moveMapFrameLeft);
+    } else if (!background.mapMoving) {
       link.xMove -= link.moveSpeed;
       link.xFrame = 29;
       link.yFrame = 31;
@@ -179,10 +203,15 @@ var link = {
       } else {
         link.leftFrame = 0;
       };
+    };
     link.moveLeftAnimation = window.requestAnimationFrame(link.moveLeft);
   },
 
   moveRight: function() {
+    if (link.xMove >= link.rightMapMove) {
+      background.mapMoving = true;
+      window.requestAnimationFrame(background.moveMapFrameRight);
+    } else if (!background.mapMoving) {
       link.xMove += link.moveSpeed;
       link.xFrame = 90;
       link.yFrame = 0;
@@ -195,6 +224,7 @@ var link = {
       } else {
         link.rightFrame = 0;
       };
+    };
     link.moveRightAnimation = window.requestAnimationFrame(link.moveRight);
   },
 
@@ -223,7 +253,7 @@ var link = {
 };
 
 
-//Player move Function and Interval
+//Player move Function
 var movePlayer = function(event) {
   //Up
   if (event.keyCode === 38) {
@@ -269,10 +299,10 @@ var animationLoop = function() {
   ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
 
   ctxBackgroundMap.drawImage(background.image, background.xFrame, background.yFrame, background.pngWidth, background.pngHeight, 0, 0, background.mapWidth, background.mapHeight);
+
   ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
 
-  // ctxSpriteMap.fillStyle = tektite.color;
-  // ctxSpriteMap.fillRect(tektite.x, tektite.y, 35, 35);
+  ctxSpriteMap.drawImage(tektite.imageDown, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
 
 
 

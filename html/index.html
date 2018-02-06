@@ -3,12 +3,25 @@
   <head>
     <meta charset="utf-8">
     <title>Top Down RPG Game</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/style.css">
   </head>
   <body>
 
-    <canvas id="background-map"></canvas>
-    <canvas id="sprite-map"></canvas>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 topspace"></div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-8 col-sm-8 canvas-div">
+          <canvas id="background-map"></canvas>
+          <canvas id="sprite-map"></canvas>
+        </div>
+      </div>
+    </div>
 
     <script
       src="http://code.jquery.com/jquery-3.3.1.min.js"

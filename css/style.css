@@ -3,6 +3,16 @@ body {
   padding: 0;
 }
 
+.topspace {
+  height: 100px;
+  width: 100px;
+  background: #EE8;
+}
+
+.col-sm-8 {
+  margin: 0 auto;
+}
+
 canvas {
   position: absolute;
   top: 0;
