@@ -15,15 +15,15 @@ backgroundMap.height = window.innerHeight;
 var background = {
   image: backgroundImage,
   xFrame: 2816,  //x axis start of current map frame (from src img)
-  yFrame: 704.5,  //y axis start of current map frame (from src img)
+  yFrame: 704,  //y axis start of current map frame (from src img)
   upFrame: 0,  //not sure if will be used
   downFrame: 0,  //not sure if will be used
   leftFrame: 0,  //not sure if will be used
   rightFrame: 0,  //not sure if will be used
-  moveSpeed: 15.06,  //not sure if will be used
+  moveSpeed: 4,  //not sure if will be used
   mapCounter: 0,  //not sure if will be used - count map frame slides ininterval function
-  pngWidth: 255.06,  //map frame width from src img
-  pngHeight: 175.5,  //map frame height from src img
+  pngWidth: 256,  //map frame width from src img
+  pngHeight: 176,  //map frame height from src img
   xMove: 0,  //not sure if will be used
   yMove: 0,  //not sure if will be used
   mapWidth: backgroundMap.width,  //how wide the background will be on canvas
@@ -31,9 +31,9 @@ var background = {
   moveMapFrameRightAnimation: null,
 
   moveMapFrameUp: function() {
-    if (background.mapCounter < 12) {
-      link.yMove += (background.moveSpeed * 1.25);
-      background.yFrame -= background.moveSpeed;
+    if (background.mapCounter < 64) {
+      link.yMove += (background.moveSpeed * 2.85);
+      background.yFrame -= (background.moveSpeed * 0.6875);
       background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameUp);
       background.mapCounter++
     } else {
@@ -43,9 +43,9 @@ var background = {
   },
 
   moveMapFrameDown: function() {
-    if (background.mapCounter < 12) {
-      link.yMove -= (background.moveSpeed * 1.25);
-      background.yFrame += background.moveSpeed;
+    if (background.mapCounter < 64) {
+      link.yMove -= (background.moveSpeed * 2.85);
+      background.yFrame += (background.moveSpeed * 0.6875);
       background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameDown);
       background.mapCounter++
     } else {
@@ -55,8 +55,8 @@ var background = {
   },
 
   moveMapFrameLeft:function() {
-    if (background.mapCounter < 17) {
-      link.xMove += (background.moveSpeed * 1.5);
+    if (background.mapCounter < 64) {
+      link.xMove += (background.moveSpeed * 2.25);
       background.xFrame -= background.moveSpeed;
       background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameLeft);
       background.mapCounter++
@@ -67,8 +67,8 @@ var background = {
   },
 
   moveMapFrameRight: function() {
-    if (background.mapCounter < 17) {
-      link.xMove -= (background.moveSpeed * 1.5);
+    if (background.mapCounter < 64) {
+      link.xMove -= (background.moveSpeed * 2.25);
       background.xFrame += background.moveSpeed;
       background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameRight);
       background.mapCounter++
