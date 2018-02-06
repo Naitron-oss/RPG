@@ -16,8 +16,8 @@ var background = {
   image: backgroundImage,
   xFrame: 2816,  //x axis start of current map frame (from src img)
   yFrame: 704.5,  //y axis start of current map frame (from src img)
-  downFrame: 0,  //not sure if will be used
   upFrame: 0,  //not sure if will be used
+  downFrame: 0,  //not sure if will be used
   leftFrame: 0,  //not sure if will be used
   rightFrame: 0,  //not sure if will be used
   moveSpeed: 15.06,  //not sure if will be used
@@ -28,7 +28,55 @@ var background = {
   yMove: 0,  //not sure if will be used
   mapWidth: backgroundMap.width,  //how wide the background will be on canvas
   mapHeight: backgroundMap.height,  //how tall the background will be on canvas
-  moveMapFrame: null
+  moveMapFrameRightAnimation: null,
+
+  moveMapFrameUp: function() {
+    if (background.mapCounter < 12) {
+      link.yMove += (background.moveSpeed * 1.25);
+      background.yFrame -= background.moveSpeed;
+      background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameUp);
+      background.mapCounter++
+    } else {
+      background.mapCounter = 0;
+      link.yMove = 735;
+    };
+  },
+
+  moveMapFrameDown: function() {
+    if (background.mapCounter < 12) {
+      link.yMove -= (background.moveSpeed * 1.25);
+      background.yFrame += background.moveSpeed;
+      background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameDown);
+      background.mapCounter++
+    } else {
+      background.mapCounter = 0;
+      link.yMove = 0;
+    };
+  },
+
+  moveMapFrameLeft:function() {
+    if (background.mapCounter < 17) {
+      link.xMove += (background.moveSpeed * 1.5);
+      background.xFrame -= background.moveSpeed;
+      background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameLeft);
+      background.mapCounter++
+    } else {
+      background.mapCounter = 0;
+      link.xMove = 560;
+    };
+  },
+
+  moveMapFrameRight: function() {
+    if (background.mapCounter < 17) {
+      link.xMove -= (background.moveSpeed * 1.5);
+      background.xFrame += background.moveSpeed;
+      background.moveMapFrameRightAnimation = window.requestAnimationFrame(background.moveMapFrameRight);
+      background.mapCounter++
+    } else {
+      background.mapCounter = 0;
+      link.xMove = 0;
+    };
+  }
 };
 
 
@@ -77,10 +125,14 @@ var link = {
   isMovingRight: false, //tracks to see if moving Right
   spriteWidth: 37.5,  //width of sprite on canvas
   spriteHeight: 40,  //height of sprite on canvas
-  moveDownInterval: null,  //interval for down movement
-  moveUpInterval: null,  //interval for up movement
-  moveLeftInterval: null,  //interval for left movement
+  moveDownAnimation: null,  //interval for down movement
+  moveUpAnimation: null,  //interval for up movement
+  moveLeftAnimation: null,  //interval for left movement
   moveRightAnimation: null,  //interval for right movement
+  upMapMove: -5, //y px where link causes map to move up
+  downMapMove: 735, //y px where link causes map to move down
+  leftMapMove: -5, //x px where link causes map to move left
+  rightMapMove: 560, //x px where link causes map to move right
 
   moveUp: function() {
       link.yMove -= link.moveSpeed;
@@ -171,52 +223,40 @@ var link = {
 };
 
 
-var moveBackgroundLeft = function() {
-  if (background.mapCounter === 0) {
-    background.moveMapFrame = setInterval(function() {
-      link.xMove += ((link.moveSpeed * .5) + background.moveSpeed);
-      background.xFrame -= background.moveSpeed;
-      background.mapCounter++;
-      console.log('map counter ' + background.mapCounter);
-      console.log('link at ' + link.xMove)
-    }, 50);
-  };
-};
-
-var stopMoveBackgroundLeft = function() {
-  // if (background.mapCounter >= 17) {
-    clearInterval(background.moveMapFrame);
-    background.mapCounter = 0;
-  // };
-};
-
-
 //Player move Function and Interval
 var movePlayer = function(event) {
   //Up
   if (event.keyCode === 38) {
-    if (!link.isMovingUp) {
+    if (link.yMove <= link.upMapMove) {
+      window.requestAnimationFrame(background.moveMapFrameUp);
+    } else if (!link.isMovingUp) {
         window.requestAnimationFrame(link.moveUp);
         link.isMovingUp = true;
       };
   }
   //Down
   if (event.keyCode === 40) {
-    if (!link.isMovingDown) {
+    if (link.yMove >= link.downMapMove) {
+      window.requestAnimationFrame(background.moveMapFrameDown);
+    } else if (!link.isMovingDown) {
         window.requestAnimationFrame(link.moveDown);
         link.isMovingDown = true;
       };
   }
   //Left
   if (event.keyCode === 37) {
-    if (!link.isMovingLeft) {
+    if (link.xMove <= link.leftMapMove) {
+      window.requestAnimationFrame(background.moveMapFrameLeft);
+    } else if (!link.isMovingLeft) {
         window.requestAnimationFrame(link.moveLeft);
         link.isMovingLeft = true;
       };
   }
   //Right
   if (event.keyCode === 39) {
-    if (!link.isMovingRight) {
+    if (link.xMove >= link.rightMapMove) {
+      window.requestAnimationFrame(background.moveMapFrameRight);
+    } else if (!link.isMovingRight) {
         window.requestAnimationFrame(link.moveRight);
         link.isMovingRight = true;
       };
