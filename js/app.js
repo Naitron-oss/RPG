@@ -82,17 +82,24 @@ spriteMap.height = 352;
 
 
 //Random Number Generators
-var rNG = function() {
-  return Math.random();
-};
-
 var coinFlip = function(num) {
-  // rNG() < 0.5 ? 0 : 1;
-  if (rNG() < 0.5) {
-    return 0;
-  } else {
-    return 1;
-  };
+  switch (Math.floor(Math.random() * num)) {
+    case 0:
+      return 0;
+      break;
+    case 1:
+      return 1;
+      break;
+    case 2:
+      return 2;
+      break;
+    case 3:
+      return 3;
+      break;
+    case 4:
+      return 4
+      break;
+  }
 };
 
 
@@ -116,36 +123,48 @@ var tektite = {
   pngHeight: 15,  //height of src img sprite size
   spriteWidth: 37.5,  //width of sprite on canvas
   spriteHeight: 40,  //height of sprite on canvas
-  xMove: 0,  //x point of link on canvas
-  yMove: 0,  //y point of link on canvas
+  xMove: 100,  //x point of link on canvas
+  yMove: 100,  //y point of link on canvas
+  moveAnimation: null,  //movement AI
   moveDirection: [this.xMove, this.yMove], //move directions
   moveSpeed: 16, //number of px to move
   numberOfSpaces: [0, 1, 2, 3], //possible spaces moved
 
   moveTektite: function() {
     //Moves if coinFlip is 1
-    //What plane (x or y) to move   IF X THEN
-    //What direction (+ or -) to move   IF + THEN
-    //If xMove < 512
-    //how many spaces to move
-
-    //What direction (+ or -) to move   IF - THEN
-    //If xMove > 0
-    //how many spaces to move
-
-
-
-    //What plane (x or y) to move   IF Y THEN
-    //What direction (+ or -) to move   IF + THEN
-    //If yMove < 352
-    //how many spaces to move
-
-    //What direction (+ or -) to move   IF - THEN
-    //If yMove > 0
-    //how many spaces to move
-
+    if (coinFlip(25) === 1) {
+      if (coinFlip(2) === 0) {  //What plane (x or y) to move   IF X THEN
+        if (coinFlip(2) === 0) {  //What direction (+ or -) to move   IF - THEN
+          if (this.xMove < 512) {  //If xMove < 512
+            //how many spaces to move
+            this.xMove = this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
+          };
+        } else if (coinFlip(2) === 1) {  //What direction (+ or -) to move   IF + THEN
+          if (this.xMove > 0) {  //If xMove > 0
+            //how many spaces to move
+            this.xMove = this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
+          };
+        };
+      } else if (coinFlip(2) === 1) {  //What plane (x or y) to move   IF Y THEN
+        if (coinFlip(2) === 0) {  //What direction (+ or -) to move   IF - THEN
+          if (this.yMove < 352) {  //If yMove < 352
+            //how many spaces to move
+            this.yMove = this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
+          };
+        } else if (coinFlip(2) === 1) {  //What direction (+ or -) to move   IF + THEN
+          if (this.yMove > 0) {  //If yMove > 0
+            //how many spaces to move
+            this.yMove = this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
+          };
+        };
+      };
+    };
+    this.moveAnimation = window.requestAnimationFrame(tektite.moveTektite);
+  }
 };
 
+
+//Player, aka Link
 var link = {
   image: linkPng,
   xFrame: 0,  //x starting point of src img for sprite frame
@@ -166,8 +185,8 @@ var link = {
   isMovingDown: false, //tracks to see if moving Down
   isMovingLeft: false, //tracks to see if moving Left
   isMovingRight: false, //tracks to see if moving Right
-  moveDownAnimation: null,  //function for down movement
-  moveUpAnimation: null,  //function for up movement
+  moveUpAnimation: null,  //function for down movement
+  moveDownAnimation: null,  //function for up movement
   moveLeftAnimation: null,  //function for left movement
   moveRightAnimation: null,  //function for right movement
   upMapMove: 0, //y px where link causes map to move up
@@ -285,7 +304,7 @@ var link = {
 
 
 //Player move Function
-var movePlayer = function(event) {
+var playerAction = function(event) {
   //Up
   if (event.keyCode === 38) {
     if (link.yMove <= link.upMapMove) {
@@ -321,7 +340,11 @@ var movePlayer = function(event) {
         window.requestAnimationFrame(link.moveRight);
         link.isMovingRight = true;
       };
-    }
+  }
+  //Spacebar
+  // if (event.keyCode === 32) {
+  //   if
+  // }
 };
 
 
@@ -331,10 +354,12 @@ var animationLoop = function() {
 
   ctxBackgroundMap.drawImage(background.image, background.xFrame, background.yFrame, background.pngWidth, background.pngHeight, 0, 0, background.mapWidth, background.mapHeight);
 
+  ctxBackgroundMap.drawImage(tektite.imageDown, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
+
   ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
 
-  ctxSpriteMap.drawImage(tektite.imageDown, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
 
+  tektite.moveTektite();
 
 
   // collisionDetection(block1.x, block1.y, block3.x, block3.y);
@@ -347,7 +372,7 @@ var animationLoop = function() {
 //Document ready function for DOM events
 document.addEventListener('DOMContentLoaded', function(event) {
   window.requestAnimationFrame(animationLoop);
-  window.addEventListener('keydown', movePlayer);
+  window.addEventListener('keydown', playerAction);
   // window.addEventListener('keyup', link.moveStop);
   window.addEventListener('keyup', link.moveStop);
 
