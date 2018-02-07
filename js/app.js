@@ -123,8 +123,8 @@ var tektite = {
   pngHeight: 15,  //height of src img sprite size
   spriteWidth: 37.5,  //width of sprite on canvas
   spriteHeight: 40,  //height of sprite on canvas
-  xMove: 100,  //x point of link on canvas
-  yMove: 100,  //y point of link on canvas
+  xMove: 150,  //x point of link on canvas
+  yMove: 150,  //y point of link on canvas
   moveAnimation: null,  //movement AI
   moveDirection: [this.xMove, this.yMove], //move directions
   moveSpeed: 16, //number of px to move
@@ -181,10 +181,12 @@ var link = {
   yMove: 0,  //y point of link on canvas
   moveSpeed: 3,  //number of px moved per interval
   frameSpeed: 14,  //number to calculate frame switch rate
-  isMovingUp: false, //tracks to see if moving Up
-  isMovingDown: false, //tracks to see if moving Down
-  isMovingLeft: false, //tracks to see if moving Left
-  isMovingRight: false, //tracks to see if moving Right
+  isMoving: false, //tracks to see if moving
+  // isMovingUp: false, //tracks to see if moving up
+  // isMovingDown: false, //tracks to see if moving down
+  // isMovingLeft: false, //tracks to see if moving left
+  // isMovingRight: false, //tracks to see if moving right
+  isAttacking: false, //tracks to see if attacking
   moveUpAnimation: null,  //function for down movement
   moveDownAnimation: null,  //function for up movement
   moveLeftAnimation: null,  //function for left movement
@@ -282,25 +284,25 @@ var link = {
     //Stop moving up
     if(event.keyCode === 38) {
       window.cancelAnimationFrame(link.moveUpAnimation);
-      link.isMovingUp = false;
+      link.isMoving = false;
       link.yFrame = 30;
     };
     //Stop moving down
     if(event.keyCode === 40) {
       window.cancelAnimationFrame(link.moveDownAnimation);
-      link.isMovingDown = false;
+      link.isMoving = false;
       link.yFrame = 0;
     };
     //Stop moving left
     if(event.keyCode === 37) {
       window.cancelAnimationFrame(link.moveLeftAnimation);
-      link.isMovingLeft = false;
+      link.isMoving = false;
       link.yFrame = 0;
     };
     //Stop moving right
     if(event.keyCode === 39) {
       window.cancelAnimationFrame(link.moveRightAnimation);
-      link.isMovingRight = false;
+      link.isMoving = false;
       link.yFrame = 31;
     };
     //Stop attacking
@@ -313,7 +315,8 @@ var link = {
           link.spriteHeight = 34;
           link.yFrame = 30;
           link.yMove += 29;
-          link.isMovingUp = false;
+          link.isMoving = false;
+          link.isAttacking = false;
           break;
           //if facing down
         case link.xFrame === 0:
@@ -322,7 +325,8 @@ var link = {
           link.spriteHeight = 34;
           link.yFrame = 0;
           link.yMove -= 3;
-          link.isMovingDown = false;
+          link.isMoving = false;
+          link.isAttacking = false;
           break;
           //if facing left
         case link.xFrame === 24:
@@ -331,7 +335,8 @@ var link = {
           link.spriteWidth = 31.875;
           link.yFrame = 0;
           link.xMove += 30;
-          link.isMovingLeft = false;
+          link.isMoving = false;
+          link.isAttacking = false;
           break;
           link.yFrame = 100;
           //if facing right
@@ -341,7 +346,8 @@ var link = {
           link.spriteWidth = 31.875;
           link.yFrame = 31;
           link.xMove -= 6;
-          link.isMovingRight = false;
+          link.isMoving = false;
+          link.isAttacking = false;
           break;
       };
     };
@@ -355,36 +361,36 @@ var playerAction = function(event) {
   if (event.keyCode === 38) {
     if (link.yMove <= link.upMapMove) {
       window.requestAnimationFrame(background.moveMapFrameUp);
-    } else if (!link.isMovingUp) {
+    } else if (!link.isMoving && !link.isAttacking) {
         window.requestAnimationFrame(link.moveUp);
-        link.isMovingUp = true;
+        link.isMoving = true;
       };
   }
   //Down
   if (event.keyCode === 40) {
     if (link.yMove >= link.downMapMove) {
       window.requestAnimationFrame(background.moveMapFrameDown);
-    } else if (!link.isMovingDown) {
+    } else if (!link.isMoving && !link.isAttacking) {
         window.requestAnimationFrame(link.moveDown);
-        link.isMovingDown = true;
+        link.isMoving = true;
       };
   }
   //Left
   if (event.keyCode === 37) {
     if (link.xMove <= link.leftMapMove) {
       window.requestAnimationFrame(background.moveMapFrameLeft);
-    } else if (!link.isMovingLeft) {
+    } else if (!link.isMoving && !link.isAttacking) {
         window.requestAnimationFrame(link.moveLeft);
-        link.isMovingLeft = true;
+        link.isMoving = true;
       };
   }
   //Right
   if (event.keyCode === 39) {
     if (link.xMove >= link.rightMapMove) {
       window.requestAnimationFrame(background.moveMapFrameRight);
-    } else if (!link.isMovingRight) {
+    } else if (!link.isMoving && !link.isAttacking) {
         window.requestAnimationFrame(link.moveRight);
-        link.isMovingRight = true;
+        link.isMoving = true;
       };
   }
   //Spacebar
@@ -397,7 +403,12 @@ var playerAction = function(event) {
         link.spriteHeight = 59.5;
         link.yFrame = 84;
         link.yMove -= 29;
-        link.isMovingUp = true;
+        link.isMoving = true;
+        link.isAttacking = true;
+        cancelAnimationFrame(link.moveUpAnimation);
+        cancelAnimationFrame(link.moveDownAnimation);
+        cancelAnimationFrame(link.moveLeftAnimation);
+        cancelAnimationFrame(link.moveRightAnimation);
         break;
         //if facing down
       case link.xFrame === 0:
@@ -406,7 +417,12 @@ var playerAction = function(event) {
         link.spriteHeight = 59.5;
         link.yFrame = 84;
         link.yMove += 3;
-        link.isMovingDown = true;
+        link.isMoving = true;
+        link.isAttacking = true;
+        cancelAnimationFrame(link.moveUpAnimation);
+        cancelAnimationFrame(link.moveDownAnimation);
+        cancelAnimationFrame(link.moveLeftAnimation);
+        cancelAnimationFrame(link.moveRightAnimation);
         break;
         //if facing left
       case link.xFrame === 29:
@@ -415,9 +431,13 @@ var playerAction = function(event) {
         link.spriteWidth = 59.5;
         link.yFrame = 90;
         link.xMove -= 30;
-        link.isMovingLeft = true;
+        link.isMoving = true;
+        link.isAttacking = true;
+        cancelAnimationFrame(link.moveUpAnimation);
+        cancelAnimationFrame(link.moveDownAnimation);
+        cancelAnimationFrame(link.moveLeftAnimation);
+        cancelAnimationFrame(link.moveRightAnimation);
         break;
-        link.yFrame = 100;
         //if facing right
       case link.xFrame === 90:
         link.xFrame = 84;
@@ -425,7 +445,12 @@ var playerAction = function(event) {
         link.spriteWidth = 59.5;
         link.yFrame = 90;
         link.xMove += 6;
-        link.isMovingRight = true;
+        link.isMoving = true;
+        link.isAttacking = true;
+        cancelAnimationFrame(link.moveUpAnimation);
+        cancelAnimationFrame(link.moveDownAnimation);
+        cancelAnimationFrame(link.moveLeftAnimation);
+        cancelAnimationFrame(link.moveRightAnimation);
         break;
     };
   };
