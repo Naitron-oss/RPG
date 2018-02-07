@@ -279,25 +279,71 @@ var link = {
   },
 
   moveStop: function(event) {
+    //Stop moving up
     if(event.keyCode === 38) {
       window.cancelAnimationFrame(link.moveUpAnimation);
       link.isMovingUp = false;
       link.yFrame = 30;
     };
+    //Stop moving down
     if(event.keyCode === 40) {
       window.cancelAnimationFrame(link.moveDownAnimation);
       link.isMovingDown = false;
       link.yFrame = 0;
     };
+    //Stop moving left
     if(event.keyCode === 37) {
       window.cancelAnimationFrame(link.moveLeftAnimation);
       link.isMovingLeft = false;
       link.yFrame = 0;
     };
+    //Stop moving right
     if(event.keyCode === 39) {
       window.cancelAnimationFrame(link.moveRightAnimation);
       link.isMovingRight = false;
       link.yFrame = 31;
+    };
+    //Stop attacking
+    if (event.keyCode === 32) {
+      switch(true) {
+        //if facing up
+        case link.xFrame === 60:
+          link.xFrame = 61;
+          link.pngHeight = 16;
+          link.spriteHeight = 34;
+          link.yFrame = 30;
+          link.yMove += 29;
+          link.isMovingUp = false;
+          break;
+          //if facing down
+        case link.xFrame === 0:
+          link.pngWidth = 15;
+          link.pngHeight = 16;
+          link.spriteHeight = 34;
+          link.yFrame = 0;
+          link.yMove -= 3;
+          link.isMovingDown = false;
+          break;
+          //if facing left
+        case link.xFrame === 24:
+          link.xFrame = 29;
+          link.pngWidth = 15;
+          link.spriteWidth = 31.875;
+          link.yFrame = 0;
+          link.xMove += 30;
+          link.isMovingLeft = false;
+          break;
+          link.yFrame = 100;
+          //if facing right
+        case link.xFrame === 84:
+          link.xFrame = 90;
+          link.pngWidth = 15;
+          link.spriteWidth = 31.875;
+          link.yFrame = 31;
+          link.xMove -= 6;
+          link.isMovingRight = false;
+          break;
+      };
     };
   }
 };
@@ -342,9 +388,47 @@ var playerAction = function(event) {
       };
   }
   //Spacebar
-  // if (event.keyCode === 32) {
-  //   if
-  // }
+  if (event.keyCode === 32) {
+    switch(true) {
+      //if facing up
+      case link.xFrame === 61:
+        link.xFrame = 60;
+        link.pngHeight = 28;
+        link.spriteHeight = 59.5;
+        link.yFrame = 84;
+        link.yMove -= 29;
+        link.isMovingUp = true;
+        break;
+        //if facing down
+      case link.xFrame === 0:
+        link.pngWidth = 16;
+        link.pngHeight = 28;
+        link.spriteHeight = 59.5;
+        link.yFrame = 84;
+        link.yMove += 3;
+        link.isMovingDown = true;
+        break;
+        //if facing left
+      case link.xFrame === 29:
+        link.xFrame = 24;
+        link.pngWidth = 28;
+        link.spriteWidth = 59.5;
+        link.yFrame = 90;
+        link.xMove -= 30;
+        link.isMovingLeft = true;
+        break;
+        link.yFrame = 100;
+        //if facing right
+      case link.xFrame === 90:
+        link.xFrame = 84;
+        link.pngWidth = 28;
+        link.spriteWidth = 59.5;
+        link.yFrame = 90;
+        link.xMove += 6;
+        link.isMovingRight = true;
+        break;
+    };
+  };
 };
 
 
