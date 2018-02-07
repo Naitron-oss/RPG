@@ -86,9 +86,14 @@ var rNG = function() {
   return Math.random();
 };
 
-// var coinFlip = function() {
-//   rNG < 0.5 ? return 0 : return 1;
-// };
+var coinFlip = function(num) {
+  // rNG() < 0.5 ? 0 : 1;
+  if (rNG() < 0.5) {
+    return 0;
+  } else {
+    return 1;
+  };
+};
 
 
 //Define character images
@@ -112,7 +117,33 @@ var tektite = {
   spriteWidth: 37.5,  //width of sprite on canvas
   spriteHeight: 40,  //height of sprite on canvas
   xMove: 0,  //x point of link on canvas
-  yMove: 0  //y point of link on canvas
+  yMove: 0,  //y point of link on canvas
+  moveDirection: [this.xMove, this.yMove], //move directions
+  moveSpeed: 16, //number of px to move
+  numberOfSpaces: [0, 1, 2, 3], //possible spaces moved
+
+  moveTektite: function() {
+    //Moves if coinFlip is 1
+    //What plane (x or y) to move   IF X THEN
+    //What direction (+ or -) to move   IF + THEN
+    //If xMove < 512
+    //how many spaces to move
+
+    //What direction (+ or -) to move   IF - THEN
+    //If xMove > 0
+    //how many spaces to move
+
+
+
+    //What plane (x or y) to move   IF Y THEN
+    //What direction (+ or -) to move   IF + THEN
+    //If yMove < 352
+    //how many spaces to move
+
+    //What direction (+ or -) to move   IF - THEN
+    //If yMove > 0
+    //how many spaces to move
+
 };
 
 var link = {
