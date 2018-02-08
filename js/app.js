@@ -1,4 +1,29 @@
 
+//Game time
+//found online, thanks to Dan Tello
+var game = {
+  score: 0,
+  now: null,
+  delta: null,
+  then: null,
+
+  frame: function() {
+    game.setDelta();
+    // game.update();
+    // game.render();
+    game.animationFrame = window.requestAnimationFrame(game.frame);
+  },
+
+  setDelta: function() {
+    game.now = Date.now();
+    game.delta = (game.now - game.then) / 1000; //seconds since last frame
+    game.then = game.now;
+  }
+};
+
+game.frame();
+
+
 //Defining backgroundMap canvas
 var backgroundMap = document.getElementById('background-map');
 var ctxBackgroundMap = backgroundMap.getContext('2d');
@@ -29,6 +54,9 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.yMove = backgroundMap.height - link.spriteHeight;
+      if (tektite.life !== 1) {
+        tektite.life = 1;
+      };
     };
   },
 
@@ -42,6 +70,9 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.yMove = 0;
+      if (tektite.life !== 1) {
+        tektite.life = 1;
+      };
     };
   },
 
@@ -55,6 +86,9 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.xMove = backgroundMap.width - link.spriteWidth;
+      if (tektite.life !== 1) {
+        tektite.life = 1;
+      };
     };
   },
 
@@ -68,6 +102,9 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.xMove = 0;
+      if (tektite.life !== 1) {
+        tektite.life = 1;
+      };
     };
   }
 };
@@ -96,9 +133,6 @@ var coinFlip = function(num) {
     case 3:
       return 3;
       break;
-    case 4:
-      return 4
-      break;
   }
 };
 
@@ -111,6 +145,29 @@ var tektitePngUp = new Image();
 tektitePngUp.src = '../images/tektite_up.png';
 var tektitePngDown = new Image();
 tektitePngDown.src = '../images/tektite_down.png';
+
+var heartPng = new Image();
+heartPng.src = '../images/heart.gif';
+
+
+//Define pickups
+var heart = {
+  image: heartPng,
+  xFrame: 57,  //x starting point of src img for sprite frame
+  yFrame: 62,  //y starting point of src img for sprite frame
+  pngWidth: 59,  //width of src img sprite size
+  pngHeight: 59,  //height of src img sprite size
+  spriteWidth: 18,  //width of sprite on canvas
+  spriteHeight: 18,  //height of sprite on canvas
+  x: Math.floor(Math.random() * 500),  //x value where to display heart
+  y: Math.floor(Math.random() * 300),  //y value where to display heart
+  show: true,
+  heartAnimation: null,
+
+  generateHeart: function() {
+    this.heartAnimation = window.requestAnimationFrame(heart.generateHeart);
+  }
+};
 
 
 //Define characters
@@ -125,37 +182,50 @@ var tektite = {
   spriteHeight: 40,  //height of sprite on canvas
   xMove: 150,  //x point of link on canvas
   yMove: 150,  //y point of link on canvas
+  xCenter: 18.75,  //x center of hit box
+  yCenter: 20,  //y center of hit box
   moveAnimation: null,  //movement AI
   moveDirection: [this.xMove, this.yMove], //move directions
   moveSpeed: 16, //number of px to move
   numberOfSpaces: [0, 1, 2, 3], //possible spaces moved
+  life: 1,  //how much life
+  points: 1,  //how many points killing tektite is worth
 
   moveTektite: function() {
     //Moves if coinFlip is 1
-    if (coinFlip(25) === 1) {
-      if (coinFlip(2) === 0) {  //What plane (x or y) to move   IF X THEN
-        if (coinFlip(2) === 0) {  //What direction (+ or -) to move   IF - THEN
-          if (this.xMove < 512) {  //If xMove < 512
-            //how many spaces to move
-            this.xMove = this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
-          };
-        } else if (coinFlip(2) === 1) {  //What direction (+ or -) to move   IF + THEN
-          if (this.xMove > 0) {  //If xMove > 0
-            //how many spaces to move
-            this.xMove = this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
-          };
+    if (coinFlip(75) === 0) {
+      var tektiteJump = coinFlip(4);
+      if (tektiteJump === 0) {  //for negative x movement
+        if (this.xMove >= 64) {
+          this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
+        } else if (this.xMove >= 48) {
+          this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(3)];
+        } else if (this.xMove >= 32) {
+          this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
         };
-      } else if (coinFlip(2) === 1) {  //What plane (x or y) to move   IF Y THEN
-        if (coinFlip(2) === 0) {  //What direction (+ or -) to move   IF - THEN
-          if (this.yMove < 352) {  //If yMove < 352
-            //how many spaces to move
-            this.yMove = this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
-          };
-        } else if (coinFlip(2) === 1) {  //What direction (+ or -) to move   IF + THEN
-          if (this.yMove > 0) {  //If yMove > 0
-            //how many spaces to move
-            this.yMove = this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
-          };
+      } else if (tektiteJump === 1) {  //for positive x movement
+        if (this.xMove <= 432) {
+          this.xMove += this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
+        } else if (this.xMove <= 448) {
+          this.xMove += this.moveSpeed * this.numberOfSpaces[coinFlip(3)];
+        } else if (this.xMove <= 464) {
+          this.xMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        };
+      } else if (tektiteJump === 2) {  //for negative y movement
+        if (this.yMove >= 64) {
+          this.yMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
+        } else if (this.yMove >= 48) {
+          this.yMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(3)];
+        } else if (this.yMove >= 32) {
+          this.yMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        };
+      } else if (tektiteJump === 3) {  //for positive y movement
+        if (this.yMove <= 272) {
+          this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(4)];
+        } else if (this.yMove <= 288) {
+          this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(3)];
+        } else if (this.yMove <= 304) {
+          this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
         };
       };
     };
@@ -166,7 +236,7 @@ var tektite = {
 
 //Player, aka Link
 var link = {
-  image: linkPng,
+  image: linkPng,  //src image
   xFrame: 0,  //x starting point of src img for sprite frame
   yFrame: 0,  //y starting point of src img for sprite frame
   upFrame: 0,  //placeholder for frame iteration
@@ -187,6 +257,9 @@ var link = {
   // isMovingLeft: false, //tracks to see if moving left
   // isMovingRight: false, //tracks to see if moving right
   isAttacking: false, //tracks to see if attacking
+  attackTime: null,  //tracks time link attacked
+  hitTime: null,  //tracks time link was hit
+  life: 3,  //how much life left
   moveUpAnimation: null,  //function for down movement
   moveDownAnimation: null,  //function for up movement
   moveLeftAnimation: null,  //function for left movement
@@ -195,6 +268,29 @@ var link = {
   downMapMove: backgroundMap.height - 34, //y px where link causes map to move down
   leftMapMove: 0, //x px where link causes map to move left
   rightMapMove: backgroundMap.width - 32, //x px where link causes map to move right
+
+  linkAttack: function() {
+    link.attackTime = Date.now();
+  },
+
+  linkHit: function() {
+    link.hitTime = Date.now();
+  },
+
+  heartDisplay: function() {
+    if (link.life === 2) {
+      $('#heart-one').css('visibility', 'hidden');
+    } else if (link.life === 1) {
+      $('#heart-two').css('visibility', 'hidden');
+    } else if (link.life === 0) {
+      $('#heart-three').css('visibility', 'hidden');
+      //link.die();
+    }
+  },
+
+  // die: function() {
+  //
+  // },
 
   moveUp: function() {
     if (link.yMove <= link.upMapMove) {
@@ -457,23 +553,68 @@ var playerAction = function(event) {
 };
 
 
+//Collision Detection between Link and enemies
+var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
+  if (!link.isAttacking && ((game.now - link.hitTime) / 1000) > 1.25 && enemy.life > 0) {
+    var xDistance = x2 - x1;
+    var yDistance = y2 - (y1 - 4);
+    var hitRadius = Math.abs(Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2)));
+    if (hitRadius <= 33) {
+      link.linkHit();
+      link.life -= 1;
+      console.log(link.life);
+      link.heartDisplay();
+    };
+  } else if (link.isAttacking && ((game.now - link.attackTime) / 1000) > .25 && enemy.life > 0) {
+    var xDistance = x2 - x1;
+    var yDistance = y2 - y1;
+    var hitRadius = Math.abs(Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2)));
+    var xRightAttack = x1 + 20;
+    var xDistanceRight = x2 - xRightAttack;
+    var hitRadiusRight = Math.abs(Math.sqrt(Math.pow(xDistanceRight, 2) + Math.pow(yDistance, 2)));
+    var yDownAttack = y1 + 18;
+    var yDistanceDown = y2 - yDownAttack;
+    var hitRadiusDown = Math.abs(Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistanceDown, 2)));
+    if (hitRadius <= 32 || hitRadiusRight <= 32 || hitRadiusDown <= 32) {
+      link.linkAttack();
+      enemy.life -= 1;
+      game.score += enemy.points;
+      console.log('link attacks!');
+    };
+  };
+};
+
+
 //Animation Loop for player and enemies
 var animationLoop = function() {
+
+  // game.frame();
+
   ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
 
   ctxBackgroundMap.drawImage(background.image, background.xFrame, background.yFrame, background.pngWidth, background.pngHeight, 0, 0, background.mapWidth, background.mapHeight);
 
+if (heart.show) {
+  ctxBackgroundMap.drawImage(heart.image, heart.xFrame, heart.yFrame, heart.pngWidth, heart.pngHeight, heart.x, heart.y, heart.spriteWidth, heart.spriteHeight);
+  heart.generateHeart();
+} else {
+  cancelAnimationFrame(heart.generateHeart);
+};
+
+if (tektite.life > 0) {
   ctxBackgroundMap.drawImage(tektite.imageDown, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
+  tektite.moveTektite();
+} else {
+  cancelAnimationFrame(tektite.moveTektite);
+};
 
   ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
 
 
-  tektite.moveTektite();
 
-
-  // collisionDetection(block1.x, block1.y, block3.x, block3.y);
+  enemyCollisionDetection(link.xMove, link.yMove, tektite.xMove, tektite.yMove, tektite);
   // collisionDetection(block2.x, block2.y, block3.x, block3.y);
-
+  $('#score-num').html(game.score);
   requestAnimationFrame(animationLoop);
 };
 

@@ -40,12 +40,14 @@ Get background frames to switch
 //Need to start/stop background frames movement
 -~-COMPLETE
 
-Step ??:
+Step 8:
 Need to fix background frame to switch correctly on all screens
 Also need to switch smoothly
+-~-COMPLETE
 
-Step ??:
+Step 9:
 Prevent Link from moving diagonally
+-~-COMPLETE - as part of sword attack, tho movement is a little stiff now
 
 
 Step ??:
