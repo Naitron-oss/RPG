@@ -83,3 +83,11 @@ canvas {
   height: 50px;
   width: 50px;
 }
+
+.heart-show {
+  visibility: visible;
+}
+
+.heart-hidden {
+  visibility: hidden;
+}

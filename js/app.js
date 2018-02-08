@@ -57,6 +57,9 @@ var background = {
       if (tektite.life !== 1) {
         tektite.life = 1;
       };
+      if (link.life <= 2) {
+        heart.show = true;
+      };
     };
   },
 
@@ -72,6 +75,9 @@ var background = {
       link.yMove = 0;
       if (tektite.life !== 1) {
         tektite.life = 1;
+      };
+      if (link.life <= 2) {
+        heart.show = true;
       };
     };
   },
@@ -89,6 +95,9 @@ var background = {
       if (tektite.life !== 1) {
         tektite.life = 1;
       };
+      if (link.life <= 2) {
+        heart.show = true;
+      };
     };
   },
 
@@ -104,6 +113,9 @@ var background = {
       link.xMove = 0;
       if (tektite.life !== 1) {
         tektite.life = 1;
+      };
+      if (link.life <= 2) {
+        heart.show = true;
       };
     };
   }
@@ -161,7 +173,7 @@ var heart = {
   spriteHeight: 18,  //height of sprite on canvas
   x: Math.floor(Math.random() * 500),  //x value where to display heart
   y: Math.floor(Math.random() * 300),  //y value where to display heart
-  show: true,
+  show: false,
   heartAnimation: null,
 
   generateHeart: function() {
@@ -193,7 +205,7 @@ var tektite = {
 
   moveTektite: function() {
     //Moves if coinFlip is 1
-    if (coinFlip(75) === 0) {
+    if (coinFlip(65) === 0) {
       var tektiteJump = coinFlip(4);
       if (tektiteJump === 0) {  //for negative x movement
         if (this.xMove >= 64) {
@@ -259,6 +271,7 @@ var link = {
   isAttacking: false, //tracks to see if attacking
   attackTime: null,  //tracks time link attacked
   hitTime: null,  //tracks time link was hit
+  heartTime: null,  //tracks time when link picked up heart
   life: 3,  //how much life left
   moveUpAnimation: null,  //function for down movement
   moveDownAnimation: null,  //function for up movement
@@ -279,11 +292,11 @@ var link = {
 
   heartDisplay: function() {
     if (link.life === 2) {
-      $('#heart-one').css('visibility', 'hidden');
+      $('#heart-one').addClass('heart-hidden');
     } else if (link.life === 1) {
-      $('#heart-two').css('visibility', 'hidden');
+      $('#heart-two').addClass('heart-hidden');
     } else if (link.life === 0) {
-      $('#heart-three').css('visibility', 'hidden');
+      $('#heart-three').addClass('heart-hidden');
       //link.die();
     }
   },
@@ -585,6 +598,31 @@ var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
 };
 
 
+//Collision detection between Link and objects
+var pickupCollisionDetection = function(x1, y1, x2, y2, object) {
+  var xDistance = x2 - x1;
+  var yDistance = y2 - y1;
+  var crashZone = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+  if (crashZone <= 30 && link.life <= 2) {
+    object.show = false;
+    if (link.life === 1 && ((game.now - link.heartTime) / 1000) > 1) {
+      console.log('heart two yay!');
+
+//ALWAYS ADDS 2 HEARTS WHEN LINK HAS 1 LIFE LEFT
+
+      link.life += 1;
+      $('#heart-two').removeClass('heart-hidden');
+      $('#heart-two').addClass('heart-show');
+    } else if (link.life === 2 && ((game.now - link.heartTime) / 1000) > 1) {
+      console.log('heart one yay!');
+      link.life += 1;
+      $('#heart-one').removeClass('heart-hidden');
+      $('#heart-one').addClass('heart-show');
+    };
+  };
+};
+
+
 //Animation Loop for player and enemies
 var animationLoop = function() {
 
@@ -611,7 +649,7 @@ if (tektite.life > 0) {
   ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
 
 
-
+  pickupCollisionDetection(link.xMove, link.yMove, heart.x, heart.y, heart);
   enemyCollisionDetection(link.xMove, link.yMove, tektite.xMove, tektite.yMove, tektite);
   // collisionDetection(block2.x, block2.y, block3.x, block3.y);
   $('#score-num').html(game.score);
