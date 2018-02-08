@@ -2,10 +2,11 @@
 //Game time
 //found online, thanks to Dan Tello
 var game = {
-  score: 0,
-  now: null,
-  delta: null,
-  then: null,
+  score: 0,  //tracks current kill score
+  needToKill: 1,  //tracks how many enemies link needs to kill to progress
+  now: null,  //current game time
+  delta: null,  //change in now and then game time, ie frame rate
+  then: null,  ////previous game time (last frame)
 
   frame: function() {
     game.setDelta();
@@ -54,8 +55,22 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.yMove = backgroundMap.height - link.spriteHeight;
-      if (tektite.life !== 1) {
+      game.needToKill += 1;
+      if (tektite.dead) {
+        tektite.dead = false;
         tektite.life = 1;
+      };
+      if (keese.dead) {
+        keese.dead = false;
+        keese.life = 1;
+      };
+      if (gibdo.dead && game.needToKill >= 3) {
+        gibdo.dead = false;
+      gibdo.life = 1;
+    };
+      if (stalfos.dead && game.needToKill >4) {
+        stalfos.dead = false;
+        stalfos.life = 2;
       };
       if (link.life <= 2) {
         heart.show = true;
@@ -73,8 +88,22 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.yMove = 0;
-      if (tektite.life !== 1) {
+      game.needToKill += 1;
+      if (tektite.dead) {
+        tektite.dead = false;
         tektite.life = 1;
+      };
+      if (keese.dead) {
+        keese.dead = false;
+        keese.life = 1;
+      };
+      if (gibdo.dead && game.needToKill >= 3) {
+        gibdo.dead = false;
+      gibdo.life = 1;
+    };
+      if (stalfos.dead && game.needToKill >4) {
+        stalfos.dead = false;
+        stalfos.life = 2;
       };
       if (link.life <= 2) {
         heart.show = true;
@@ -92,8 +121,22 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.xMove = backgroundMap.width - link.spriteWidth;
-      if (tektite.life !== 1) {
+      game.needToKill += 1;
+      if (tektite.dead) {
+        tektite.dead = false;
         tektite.life = 1;
+      };
+      if (keese.dead) {
+        keese.dead = false;
+        keese.life = 1;
+      };
+      if (gibdo.dead && game.needToKill >= 3) {
+        gibdo.dead = false;
+      gibdo.life = 1;
+    };
+      if (stalfos.dead && game.needToKill > 4) {
+        stalfos.dead = false;
+        stalfos.life = 2;
       };
       if (link.life <= 2) {
         heart.show = true;
@@ -111,8 +154,22 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.xMove = 0;
-      if (tektite.life !== 1) {
+      game.needToKill += 1;
+      if (tektite.dead) {
+        tektite.dead = false;
         tektite.life = 1;
+      };
+      if (keese.dead) {
+        keese.dead = false;
+        keese.life = 1;
+      };
+      if (gibdo.dead && game.needToKill >= 3) {
+        gibdo.dead = false;
+      gibdo.life = 1;
+    };
+      if (stalfos.dead && game.needToKill >4) {
+        stalfos.dead = false;
+        stalfos.life = 2;
       };
       if (link.life <= 2) {
         heart.show = true;
@@ -149,14 +206,30 @@ var coinFlip = function(num) {
 };
 
 
+//Random starting x and y points
+var xStarting = function(spriteWidth) {
+  return Math.floor(Math.random() * (510 - spriteWidth));
+};
+var yStarting = function(spriteHeight) {
+  return Math.floor(Math.random() * (350 - spriteHeight));
+};
+
+
 //Define character images
 var linkPng = new Image();
 linkPng.src = '../images/link-spritesheet.png';
 
-var tektitePngUp = new Image();
-tektitePngUp.src = '../images/tektite_up.png';
-var tektitePngDown = new Image();
-tektitePngDown.src = '../images/tektite_down.png';
+var tektitePng = new Image();
+tektitePng.src = '../images/tektite.png';
+
+var keesePng = new Image();
+keesePng.src = '../images/keese.png';
+
+var gibdoPng = new Image();
+gibdoPng.src = '../images/gibdo.png';
+
+var stalfosPng = new Image();
+stalfosPng.src = '../images/stalfos.png';
 
 var heartPng = new Image();
 heartPng.src = '../images/heart.gif';
@@ -171,8 +244,8 @@ var heart = {
   pngHeight: 59,  //height of src img sprite size
   spriteWidth: 18,  //width of sprite on canvas
   spriteHeight: 18,  //height of sprite on canvas
-  x: Math.floor(Math.random() * 500),  //x value where to display heart
-  y: Math.floor(Math.random() * 300),  //y value where to display heart
+  x: xStarting(20),  //x value where to display heart
+  y: yStarting(20),  //y value where to display heart
   show: false,
   heartAnimation: null,
 
@@ -183,17 +256,18 @@ var heart = {
 
 
 //Define characters
+
+//spider creature, jumps up to 3 spaces, slowly and randomly
 var tektite = {
-  imageUp: tektitePngUp,
-  imageDown: tektitePngDown,
+  image: tektitePng,
   xFrame: 0,  //x starting point of src img for sprite frame
   yFrame: 0,  //y starting point of src img for sprite frame
   pngWidth: 16,  //width of src img sprite size
   pngHeight: 15,  //height of src img sprite size
   spriteWidth: 37.5,  //width of sprite on canvas
   spriteHeight: 40,  //height of sprite on canvas
-  xMove: 150,  //x point of link on canvas
-  yMove: 150,  //y point of link on canvas
+  xMove:   xStarting(40),  //x point of tektite on canvas
+  yMove:   yStarting(45),  //y point of tektite on canvas
   xCenter: 18.75,  //x center of hit box
   yCenter: 20,  //y center of hit box
   moveAnimation: null,  //movement AI
@@ -201,6 +275,7 @@ var tektite = {
   moveSpeed: 16, //number of px to move
   numberOfSpaces: [0, 1, 2, 3], //possible spaces moved
   life: 1,  //how much life
+  dead: false,  //tracks if dead or not
   points: 1,  //how many points killing tektite is worth
 
   moveTektite: function() {
@@ -244,6 +319,135 @@ var tektite = {
     this.moveAnimation = window.requestAnimationFrame(tektite.moveTektite);
   }
 };
+
+//bat creature, moves 1 space, normal speed and randomly
+var keese = {
+  image: keesePng,
+  xFrame: 0,  //x starting point of src img for sprite frame
+  yFrame: 0,  //y starting point of src img for sprite frame
+  pngWidth: 16,  //width of src img sprite size
+  pngHeight: 10,  //height of src img sprite size
+  spriteWidth: 36,  //width of sprite on canvas
+  spriteHeight: 22.5,  //height of sprite on canvas
+  xMove:   xStarting(40),  //x point of keese on canvas
+  yMove:   yStarting(45),  //y point of keese on canvas
+  xCenter: 18.75,  //x center of hit box
+  yCenter: 20,  //y center of hit box
+  moveAnimation: null,  //movement AI
+  moveDirection: [this.xMove, this.yMove], //move directions
+  moveSpeed: 16, //number of px to move
+  numberOfSpaces: [0, 1], //possible spaces moved
+  life: 0,  //how much life
+  dead: true,  //tracks if dead or not
+  points: 1,  //how many points killing keese is worth
+
+  moveKeese: function() {
+    //Moves if coinFlip is 1
+    if (coinFlip(30) === 0) {
+      var keeseJump = coinFlip(4);
+      if (keeseJump === 0) {  //for negative x movement
+        if (this.xMove >= 32) {
+          this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        };
+      } else if (keeseJump === 1) {  //for positive x movement
+        if (this.xMove <= 464) {
+          this.xMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        };
+      } else if (keeseJump === 2) {  //for negative y movement
+        if (this.yMove >= 32) {
+          this.yMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        };
+      } else if (keeseJump === 3) {  //for positive y movement
+        if (this.yMove <= 304) {
+          this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        };
+      };
+    };
+    this.moveAnimation = window.requestAnimationFrame(keese.moveKeese);
+  }
+};
+
+//mummy creature, moves 1px frequently, somewhat slow and towards link
+var gibdo = {
+  image: gibdoPng,
+  xFrame: 0,  //x starting point of src img for sprite frame
+  yFrame: 0,  //y starting point of src img for sprite frame
+  pngWidth: 16,  //width of src img sprite size
+  pngHeight: 16,  //height of src img sprite size
+  spriteWidth: 43,  //width of sprite on canvas
+  spriteHeight: 43,  //height of sprite on canvas
+  xMove:   xStarting(50),  //x point of gibdo on canvas
+  yMove:   yStarting(50),  //y point of gibdo on canvas
+  xCenter: 18.75,  //x center of hit box
+  yCenter: 20,  //y center of hit box
+  moveAnimation: null,  //movement AI
+  moveDirection: [this.xMove, this.yMove], //move directions
+  moveSpeed: 1, //number of px to move
+  numberOfSpaces: [0, 1], //possible spaces moved
+  life: 0,  //how much life
+  dead: true,  //tracks if dead or not
+  points: 1,  //how many points killing gibdo is worth
+
+  moveGibdo: function() {
+    //Moves if coinFlip is 1
+    if (coinFlip(2) === 0) {
+      if (this.xMove - link.xMove >= 0) {
+        this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+      } else if (this.xMove - link.xMove < 0) {
+        this.xMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+      }
+    } else if (coinFlip(2) === 1) {
+      if (this.yMove - link.yMove >= 0) {
+        this.yMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+      } else if (this.yMove - link.yMove < 0) {
+        this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+      };
+    };
+    this.moveAnimation = window.requestAnimationFrame(gibdo.moveGibdo);
+  }
+};
+
+
+//skeleton creature, moves quickly towards link
+var stalfos = {
+  image: stalfosPng,
+  xFrame: 0,  //x starting point of src img for sprite frame
+  yFrame: 0,  //y starting point of src img for sprite frame
+  pngWidth: 16,  //width of src img sprite size
+  pngHeight: 16,  //height of src img sprite size
+  spriteWidth: 43,  //width of sprite on canvas
+  spriteHeight: 43,  //height of sprite on canvas
+  xMove:   xStarting(50),  //x point of stalfos on canvas
+  yMove:   yStarting(50),  //y point of stalfos on canvas
+  xCenter: 18.75,  //x center of hit box
+  yCenter: 20,  //y center of hit box
+  moveAnimation: null,  //movement AI
+  moveDirection: [this.xMove, this.yMove], //move directions
+  moveSpeed: 1, //number of px to move
+  numberOfSpaces: [0, 1], //possible spaces moved
+  life: 2,  //how much life
+  dead: false,  //tracks if dead or not
+  points: 1,  //how many points killing stalfos is worth
+
+  moveStalfos: function() {
+    //Moves if coinFlip is 1
+    if (coinFlip(2) === 0) {
+      if (this.xMove - link.xMove >= 0) {
+        this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+      } else if (this.xMove - link.xMove < 0) {
+        this.xMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+      }
+    } else if (coinFlip(2) === 1) {
+      if (this.yMove - link.yMove >= 0) {
+        this.yMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+      } else if (this.yMove - link.yMove < 0) {
+        this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+      };
+    };
+    this.moveAnimation = window.requestAnimationFrame(stalfos.moveStalfos);
+  }
+};
+
 
 
 //Player, aka Link
@@ -290,6 +494,10 @@ var link = {
     link.hitTime = Date.now();
   },
 
+  grabHeart: function() {
+    link.heartTime = Date.now();
+  },
+
   heartDisplay: function() {
     if (link.life === 2) {
       $('#heart-one').addClass('heart-hidden');
@@ -306,10 +514,10 @@ var link = {
   // },
 
   moveUp: function() {
-    if (link.yMove <= link.upMapMove) {
+    if (link.yMove <= link.upMapMove && game.score >= game.needToKill) {
       background.mapMoving = true;
       window.requestAnimationFrame(background.moveMapFrameUp);
-    } else if (!background.mapMoving) {
+    } else if (!background.mapMoving && link.yMove >= 0) {
       link.yMove -= link.moveSpeed;
       link.xFrame = 61;
       link.yFrame = 0;
@@ -327,10 +535,10 @@ var link = {
   },
 
   moveDown: function() {
-      if (link.yMove >= link.downMapMove) {
+      if (link.yMove >= link.downMapMove && game.score >= game.needToKill) {
         background.mapMoving = true;
         window.requestAnimationFrame(background.moveMapFrameDown);
-      } else if (!background.mapMoving) {
+      } else if (!background.mapMoving && link.yMove <= 317) {
         link.yMove += link.moveSpeed;
         link.xFrame = 0;
         link.yFrame = 0;
@@ -348,10 +556,10 @@ var link = {
   },
 
   moveLeft: function() {
-    if (link.xMove <= link.leftMapMove) {
+    if (link.xMove <= link.leftMapMove && game.score >= game.needToKill) {
       background.mapMoving = true;
       window.requestAnimationFrame(background.moveMapFrameLeft);
-    } else if (!background.mapMoving) {
+    } else if (!background.mapMoving && link.xMove >= 0) {
       link.xMove -= link.moveSpeed;
       link.xFrame = 29;
       link.yFrame = 31;
@@ -369,10 +577,10 @@ var link = {
   },
 
   moveRight: function() {
-    if (link.xMove >= link.rightMapMove) {
+    if (link.xMove >= link.rightMapMove && game.score >= game.needToKill) {
       background.mapMoving = true;
       window.requestAnimationFrame(background.moveMapFrameRight);
-    } else if (!background.mapMoving) {
+    } else if (!background.mapMoving&& link.xMove <= 479) {
       link.xMove += link.moveSpeed;
       link.xFrame = 90;
       link.yFrame = 0;
@@ -468,36 +676,36 @@ var link = {
 var playerAction = function(event) {
   //Up
   if (event.keyCode === 38) {
-    if (link.yMove <= link.upMapMove) {
+    if (link.yMove <= link.upMapMove && game.score >= game.needToKill) {
       window.requestAnimationFrame(background.moveMapFrameUp);
-    } else if (!link.isMoving && !link.isAttacking) {
+    } else if (!link.isMoving && !link.isAttacking && link.yMove >= 1) {
         window.requestAnimationFrame(link.moveUp);
         link.isMoving = true;
       };
   }
   //Down
   if (event.keyCode === 40) {
-    if (link.yMove >= link.downMapMove) {
+    if (link.yMove >= link.downMapMove && game.score >= game.needToKill) {
       window.requestAnimationFrame(background.moveMapFrameDown);
-    } else if (!link.isMoving && !link.isAttacking) {
+    } else if (!link.isMoving && !link.isAttacking && link.yMove <= 317) {
         window.requestAnimationFrame(link.moveDown);
         link.isMoving = true;
       };
   }
   //Left
   if (event.keyCode === 37) {
-    if (link.xMove <= link.leftMapMove) {
+    if (link.xMove <= link.leftMapMove && game.score >= game.needToKill) {
       window.requestAnimationFrame(background.moveMapFrameLeft);
-    } else if (!link.isMoving && !link.isAttacking) {
+    } else if (!link.isMoving && !link.isAttacking && link.xMove >= 0) {
         window.requestAnimationFrame(link.moveLeft);
         link.isMoving = true;
       };
   }
   //Right
   if (event.keyCode === 39) {
-    if (link.xMove >= link.rightMapMove) {
+    if (link.xMove >= link.rightMapMove && game.score >= game.needToKill) {
       window.requestAnimationFrame(background.moveMapFrameRight);
-    } else if (!link.isMoving && !link.isAttacking) {
+    } else if (!link.isMoving && !link.isAttacking && link.xMove <= 479) {
         window.requestAnimationFrame(link.moveRight);
         link.isMoving = true;
       };
@@ -568,14 +776,13 @@ var playerAction = function(event) {
 
 //Collision Detection between Link and enemies
 var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
-  if (!link.isAttacking && ((game.now - link.hitTime) / 1000) > 1.25 && enemy.life > 0) {
+  if (!link.isAttacking && ((game.now - link.hitTime) / 1000) > 1 && enemy.life > 0) {
     var xDistance = x2 - x1;
     var yDistance = y2 - (y1 - 4);
     var hitRadius = Math.abs(Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2)));
     if (hitRadius <= 33) {
       link.linkHit();
       link.life -= 1;
-      console.log(link.life);
       link.heartDisplay();
     };
   } else if (link.isAttacking && ((game.now - link.attackTime) / 1000) > .25 && enemy.life > 0) {
@@ -591,8 +798,14 @@ var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
     if (hitRadius <= 32 || hitRadiusRight <= 32 || hitRadiusDown <= 32) {
       link.linkAttack();
       enemy.life -= 1;
-      game.score += enemy.points;
-      console.log('link attacks!');
+      if (enemy.life === 0) {
+        enemy.dead = true;
+      };
+      if (enemy.dead) {
+        enemy.xMove = xStarting(enemy.spriteWidth);
+        enemy.yMove = yStarting(enemy.spriteHeight);
+        game.score += enemy.points;
+      };
     };
   };
 };
@@ -605,16 +818,15 @@ var pickupCollisionDetection = function(x1, y1, x2, y2, object) {
   var crashZone = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
   if (crashZone <= 30 && link.life <= 2) {
     object.show = false;
+    object.x = xStarting(object.spriteWidth);
+    object.y = yStarting(object.spriteHeight);
     if (link.life === 1 && ((game.now - link.heartTime) / 1000) > 1) {
-      console.log('heart two yay!');
-
-//ALWAYS ADDS 2 HEARTS WHEN LINK HAS 1 LIFE LEFT
-
+      link.grabHeart();
       link.life += 1;
       $('#heart-two').removeClass('heart-hidden');
       $('#heart-two').addClass('heart-show');
     } else if (link.life === 2 && ((game.now - link.heartTime) / 1000) > 1) {
-      console.log('heart one yay!');
+      link.grabHeart();
       link.life += 1;
       $('#heart-one').removeClass('heart-hidden');
       $('#heart-one').addClass('heart-show');
@@ -639,19 +851,51 @@ if (heart.show) {
   cancelAnimationFrame(heart.generateHeart);
 };
 
-if (tektite.life > 0) {
-  ctxBackgroundMap.drawImage(tektite.imageDown, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
+if (!tektite.dead) {
+  ctxBackgroundMap.drawImage(tektite.image, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
   tektite.moveTektite();
 } else {
   cancelAnimationFrame(tektite.moveTektite);
 };
 
+if (!keese.dead && game.needToKill >= 2) {
+  ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
+  keese.moveKeese();
+} else {
+  cancelAnimationFrame(keese.moveKeese);
+};
+
+if (!gibdo.dead && game.needToKill >= 2) {
+  ctxBackgroundMap.drawImage(gibdo.image, gibdo.xFrame, gibdo.yFrame, gibdo.pngWidth, gibdo.pngHeight, gibdo.xMove, gibdo.yMove, gibdo.spriteWidth, gibdo.spriteHeight);
+  gibdo.moveGibdo();
+} else {
+  cancelAnimationFrame(gibdo.moveGibdo);
+};
+
+if (!stalfos.dead && game.needToKill >= 0) {
+  ctxBackgroundMap.drawImage(stalfos.image, stalfos.xFrame, stalfos.yFrame, stalfos.pngWidth, stalfos.pngHeight, stalfos.xMove, stalfos.yMove, stalfos.spriteWidth, stalfos.spriteHeight);
+  stalfos.moveStalfos();
+} else {
+  cancelAnimationFrame(stalfos.moveStalfos);
+};
+
   ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
 
 
+//Collision checks
+  //heart
   pickupCollisionDetection(link.xMove, link.yMove, heart.x, heart.y, heart);
+  //tektite
   enemyCollisionDetection(link.xMove, link.yMove, tektite.xMove, tektite.yMove, tektite);
-  // collisionDetection(block2.x, block2.y, block3.x, block3.y);
+  //keese
+  enemyCollisionDetection(link.xMove, link.yMove, keese.xMove, keese.yMove, keese);
+  //gibdo
+  enemyCollisionDetection(link.xMove, link.yMove, gibdo.xMove, gibdo.yMove, gibdo);
+  //stalfos
+  enemyCollisionDetection(link.xMove, link.yMove, stalfos.xMove, stalfos.yMove, stalfos);
+
+
+
   $('#score-num').html(game.score);
   requestAnimationFrame(animationLoop);
 };
