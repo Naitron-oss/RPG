@@ -1,6 +1,7 @@
 
 //Game info and functions
 var game = {
+  over: true,  //tracks game over or not
   score: 0,  //tracks current kill score
   level: 1,  //which level player is on
   needToKill: 1,  //tracks how many enemies link needs to kill to progress
@@ -72,10 +73,19 @@ backgroundMap.width = 512;
 backgroundMap.height = 352;
 
 
+//Random starting x and y points for map
+var xMapStart = function(spriteWidth) {
+  return (Math.floor(Math.random() * 16)) * 256;
+};
+var yMapStart = function(spriteHeight) {
+  return (Math.floor(Math.random() * 8)) * 176;
+};
+
+
 var background = {
   image: backgroundImage,
-  xFrame: 2816,  //x axis start of current map frame (from src img)
-  yFrame: 704,  //y axis start of current map frame (from src img)
+  xFrame: xMapStart(),  //x axis start of current map frame (from src img)
+  yFrame: yMapStart(),  //y axis start of current map frame (from src img)
   moveSpeed: 4,  //speed at which map moves frames
   mapCounter: 0,  //count map frame slides for map move function
   pngWidth: 256,  //map frame width from src img
@@ -187,7 +197,16 @@ var background = {
 };
 
 
-//Defining spriteMap canvas
+//Defining sprite and enemy map canvas'
+var enemyMap = document.getElementById('enemy-map');
+var ctxEnemyMap = enemyMap.getContext('2d');
+enemyMap.width = 512;
+enemyMap.height = 352;
+
+var deathCanvas = document.getElementById('death-canvas');
+var ctxDeathCanvas = deathCanvas.getContext('2d');
+deathCanvas.width = 512;
+deathCanvas.height = 352;
 
 var spriteMap = document.getElementById('sprite-map');
 var ctxSpriteMap = spriteMap.getContext('2d');
@@ -554,8 +573,8 @@ var link = {
   pngHeight: 16,  //height of src img sprite size
   spriteWidth: 31.875,  //width of sprite on canvas
   spriteHeight: 34,  //height of sprite on canvas
-  xMove: 0,  //x point of link on canvas
-  yMove: 0,  //y point of link on canvas
+  xMove: xStarting(32),  //x point of link on canvas
+  yMove: yStarting(35),  //y point of link on canvas
   moveSpeed: 3,  //number of px moved per interval
   frameSpeed: 14,  //number to calculate frame switch rate
   isMoving: false, //tracks to see if moving
@@ -591,22 +610,30 @@ var link = {
     link.heartTime = Date.now();
   },
 
+  //heart gif functionality
+  heartGifArray: [$('#heart-one'), $('#heart-two'), $('#heart-three'), $('#heart-four')],  //heart gif icons
   heartDisplay: function() {
-    if (link.life === 3) {
+    if (link.life === link.maxLife) {
+      for (var i = 0; i < link.heartGifArray.length; i ++) {
+        if (link.heartGifArray[i].hasClass('heart-hidden')) {
+          link.heartGifArray[i].removeClass('heart-hidden');
+          link.heartGifArray[i].addClass('heart-show');
+        };
+      };
+    } else if (link.life === link.maxLife - 1) {
       $('#heart-one').addClass('heart-hidden');
-    } else if (link.life === 2) {
+    } else if (link.life === link.maxLife - 2) {
       $('#heart-one').addClass('heart-hidden');
       $('#heart-two').addClass('heart-hidden');
-    } else if (link.life === 1) {
+    } else if (link.life === link.maxLife - 3) {
       $('#heart-one').addClass('heart-hidden');
       $('#heart-two').addClass('heart-hidden');
       $('#heart-three').addClass('heart-hidden');
-    } else if (link.life === 0) {
+    } else if (link.life <= 0) {
       $('#heart-one').addClass('heart-hidden');
       $('#heart-two').addClass('heart-hidden');
       $('#heart-three').addClass('heart-hidden');
       $('#heart-four').addClass('heart-hidden');
-      //link.die();
     }
   },
 
@@ -916,127 +943,181 @@ var pickupCollisionDetection = function(x1, y1, x2, y2, object) {
 };
 
 
+//Game over function
+var gameOver = function() {
+  cancelAnimationFrame(animateGame);
+  ctxEnemyMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+  deathCanvas.style.opacity = '0.56';
+  // ctxBackgroundMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+
+};
+
+
 //Animation Game Loop
+var animateGame = null;
 var animationLoop = function() {
 
-  game.setGameNow();
+  if (link.life <= 0) {
+    game.over = true;
+  };
 
-  ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
-  ctxBackgroundMap.drawImage(background.image, background.xFrame, background.yFrame, background.pngWidth, background.pngHeight, 0, 0, background.mapWidth, background.mapHeight);
+  if (!game.over) {
+    game.setGameNow();
 
-  if (background.moveMapUp) {
-    if (background.mapCounter < 64) {
-      background.moveMapFrameUpStart();
-    } else {
-      background.moveMapFrameUpStop();
+    ctxEnemyMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
+    ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+    ctxBackgroundMap.drawImage(background.image, background.xFrame, background.yFrame, background.pngWidth, background.pngHeight, 0, 0, background.mapWidth, background.mapHeight);
+
+    if (background.moveMapUp) {
+      if (background.mapCounter < 64) {
+        background.moveMapFrameUpStart();
+      } else {
+        background.moveMapFrameUpStop();
+      };
     };
-  };
 
-  if (background.moveMapDown) {
-    if (background.mapCounter < 64) {
-      background.moveMapFrameDownStart();
-    } else {
-      background.moveMapFrameDownStop();
+    if (background.moveMapDown) {
+      if (background.mapCounter < 64) {
+        background.moveMapFrameDownStart();
+      } else {
+        background.moveMapFrameDownStop();
+      };
     };
-  };
 
-  if (background.moveMapLeft) {
-    if (background.mapCounter < 64) {
-      background.moveMapFrameLeftStart();
-    } else {
-      background.moveMapFrameLeftStop();
+    if (background.moveMapLeft) {
+      if (background.mapCounter < 64) {
+        background.moveMapFrameLeftStart();
+      } else {
+        background.moveMapFrameLeftStop();
+      };
     };
-  };
 
-  if (background.moveMapRight) {
-    if (background.mapCounter < 64) {
-      background.moveMapFrameRightStart();
-    } else {
-      background.moveMapFrameRightStop();
+    if (background.moveMapRight) {
+      if (background.mapCounter < 64) {
+        background.moveMapFrameRightStart();
+      } else {
+        background.moveMapFrameRightStop();
+      };
     };
+
+    //Animates hearts
+    if (heart.show) {
+      ctxEnemyMap.drawImage(heart.image, heart.xFrame, heart.yFrame, heart.pngWidth, heart.pngHeight, heart.x, heart.y, heart.spriteWidth, heart.spriteHeight);
+    };
+    //Animates tektites
+    if (!tektite.dead && game.level >= tektite.levelShowUp) {
+      ctxEnemyMap.drawImage(tektite.image, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
+      tektite.moveTektite();
+    };
+
+    //Animates keese
+    if (!keese.dead && game.level >= keese.levelShowUp) {
+      ctxEnemyMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
+      keese.moveKeese();
+    };
+
+    //Animates gibdo
+    if (!gibdo.dead && game.level >= gibdo.levelShowUp) {
+      ctxEnemyMap.drawImage(gibdo.image, gibdo.xFrame, gibdo.yFrame, gibdo.pngWidth, gibdo.pngHeight, gibdo.xMove, gibdo.yMove, gibdo.spriteWidth, gibdo.spriteHeight);
+      gibdo.moveGibdo();
+    };
+
+    //Animates stalfos
+    if (!stalfos.dead && game.level >= stalfos.levelShowUp) {
+      ctxEnemyMap.drawImage(stalfos.image, stalfos.xFrame, stalfos.yFrame, stalfos.pngWidth, stalfos.pngHeight, stalfos.xMove, stalfos.yMove, stalfos.spriteWidth, stalfos.spriteHeight);
+      stalfos.moveStalfos();
+    };
+
+    //Animates dodongo
+    if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove < 575) {
+      ctxEnemyMap.drawImage(dodongo.image, dodongo.xFrame, dodongo.yFrame, dodongo.pngWidth, dodongo.pngHeight, dodongo.xMove, dodongo.yMove, dodongo.spriteWidth, dodongo.spriteHeight);
+      dodongo.moveDodongo();
+    };
+    if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove >= 575) {
+      dodongo.dead = true;
+      resetOffscreenEnemies(dodongo);
+    };
+
+    //Animates link
+    ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
+    link.invincible = $('#invincible').prop('checked');
+
+    if (link.isMovingUp) {
+      link.moveUp();
+    };
+    if (link.isMovingDown) {
+      link.moveDown();
+    };
+    if (link.isMovingLeft) {
+      link.moveLeft();
+    };
+    if (link.isMovingRight) {
+      link.moveRight();
+    };
+
+  //Collision checks
+    //heart
+    pickupCollisionDetection(link.xMove, link.yMove, heart.x, heart.y, heart);
+    //tektite
+    enemyCollisionDetection(link.xMove, link.yMove, tektite.xMove, tektite.yMove, tektite);
+    //keese
+    enemyCollisionDetection(link.xMove, link.yMove, keese.xMove, keese.yMove, keese);
+    //gibdo
+    enemyCollisionDetection(link.xMove, link.yMove, gibdo.xMove, gibdo.yMove, gibdo);
+    //stalfos
+    enemyCollisionDetection(link.xMove, link.yMove, stalfos.xMove, stalfos.yMove, stalfos);
+    //dodongo
+    enemyCollisionDetection(link.xMove, link.yMove, dodongo.xMove, dodongo.yMove, dodongo);
+
+  //Updates score, high score, level, and kills to advance
+    $('#score-num').html(game.score);
+    $('#game-num').html(game.level);
+    $('#kills-num').html(game.needToKill);
+    //$('#high-score').html()
+    animateGame = requestAnimationFrame(animationLoop);
+
+  } else if (game.over) {
+    gameOver();
+    // animateGame = requestAnimationFrame(animationLoop);
   };
 
-  //Animates hearts
-  if (heart.show) {
-    ctxBackgroundMap.drawImage(heart.image, heart.xFrame, heart.yFrame, heart.pngWidth, heart.pngHeight, heart.x, heart.y, heart.spriteWidth, heart.spriteHeight);
-  };
-  //Animates tektites
-  if (!tektite.dead && game.level >= tektite.levelShowUp) {
-    ctxBackgroundMap.drawImage(tektite.image, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
-    tektite.moveTektite();
-  };
+};
 
-  //Animates keese
-  if (!keese.dead && game.level >= keese.levelShowUp) {
-    ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
-    keese.moveKeese();
-  };
 
-  //Animates gibdo
-  if (!gibdo.dead && game.level >= gibdo.levelShowUp) {
-    ctxBackgroundMap.drawImage(gibdo.image, gibdo.xFrame, gibdo.yFrame, gibdo.pngWidth, gibdo.pngHeight, gibdo.xMove, gibdo.yMove, gibdo.spriteWidth, gibdo.spriteHeight);
-    gibdo.moveGibdo();
+//replay and restart game
+var replayGame = function() {
+  if (game.over) {
+    allEnemies.forEach(function(baddy) {
+      baddy.dead = true;
+      baddy.life = 0;
+    });
+    tektite.dead = false;
+    tektite.life = tektite.maxLife;
+    tektite.xMove = xStarting(tektite.spriteWidth);
+    tektite.yMove = yStarting(tektite.spriteHeight);
+    dodongo.xMove = -100;
+    dodongo.yMove = yStarting(50);
+    heart.show = false;
+    link.life = link.maxLife;
+    link.heartDisplay();
+    link.xMove = xStarting(32);
+    link.yMove = yStarting(35);
+    game.over = false;
+    game.level = 1;
+    game.setNeedToKill();
+    game.score = 0;
+    background.xFrame = xMapStart();
+    background.yFrame = yMapStart();
+    deathCanvas.style.opacity = '0';
+    animationLoop();
   };
-
-  //Animates stalfos
-  if (!stalfos.dead && game.level >= stalfos.levelShowUp) {
-    ctxBackgroundMap.drawImage(stalfos.image, stalfos.xFrame, stalfos.yFrame, stalfos.pngWidth, stalfos.pngHeight, stalfos.xMove, stalfos.yMove, stalfos.spriteWidth, stalfos.spriteHeight);
-    stalfos.moveStalfos();
-  };
-
-  //Animates dodongo
-  if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove < 575) {
-    ctxBackgroundMap.drawImage(dodongo.image, dodongo.xFrame, dodongo.yFrame, dodongo.pngWidth, dodongo.pngHeight, dodongo.xMove, dodongo.yMove, dodongo.spriteWidth, dodongo.spriteHeight);
-    dodongo.moveDodongo();
-  };
-  if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove >= 575) {
-    dodongo.dead = true;
-    resetOffscreenEnemies(dodongo);
-  };
-
-  //Animates link
-  ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
-  link.invincible = $('#invincible').prop('checked');
-
-  if (link.isMovingUp) {
-    link.moveUp();
-  };
-  if (link.isMovingDown) {
-    link.moveDown();
-  };
-  if (link.isMovingLeft) {
-    link.moveLeft();
-  };
-  if (link.isMovingRight) {
-    link.moveRight();
-  };
-
-//Collision checks
-  //heart
-  pickupCollisionDetection(link.xMove, link.yMove, heart.x, heart.y, heart);
-  //tektite
-  enemyCollisionDetection(link.xMove, link.yMove, tektite.xMove, tektite.yMove, tektite);
-  //keese
-  enemyCollisionDetection(link.xMove, link.yMove, keese.xMove, keese.yMove, keese);
-  //gibdo
-  enemyCollisionDetection(link.xMove, link.yMove, gibdo.xMove, gibdo.yMove, gibdo);
-  //stalfos
-  enemyCollisionDetection(link.xMove, link.yMove, stalfos.xMove, stalfos.yMove, stalfos);
-  //dodongo
-  enemyCollisionDetection(link.xMove, link.yMove, dodongo.xMove, dodongo.yMove, dodongo);
-
-//Updates score, high score, level, and kills to advance
-  $('#score-num').html(game.score);
-  $('#game-num').html(game.level);
-  $('#kills-num').html(game.needToKill);
-  //$('#high-score').html()
-  requestAnimationFrame(animationLoop);
 };
 
 
 //Document ready function for DOM events
 document.addEventListener('DOMContentLoaded', function(event) {
-  animationLoop();
+  $('#start-game').on('click', replayGame);
+  $('#replay-game').on('click', replayGame);
   window.addEventListener('keydown', link.playerAction);
   window.addEventListener('keyup', link.actionStop);
 

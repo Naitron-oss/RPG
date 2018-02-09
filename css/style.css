@@ -69,6 +69,21 @@ canvas {
   z-index: 1;
 }
 
+#enemy-map {
+  background: transparent;
+  width: 100%;
+  height: auto;
+  z-index: 5;
+}
+
+#death-canvas {
+  background: rgba(235, 44, 18, 0.56);
+  opacity: 0;
+  width: 100%;
+  height: auto;
+  z-index: 5;
+}
+
 #sprite-map {
   background: transparent;
   width: 100%;
