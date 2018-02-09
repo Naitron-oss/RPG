@@ -60,6 +60,12 @@ var game = {
 
 game.frame();
 
+var animationFrameCancelArray = [];
+var cancelFramesArray = function() {
+  while (animationFrameCancelArray.length > 0) {
+    window.cancelAnimationFrame(animationFrameCancelArray.pop());
+  }
+};
 
 //Defining backgroundMap canvas
 var backgroundMap = document.getElementById('background-map');
@@ -87,7 +93,11 @@ var background = {
       background.yFrame -= (background.moveSpeed * 0.6875);
       background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameUp);
       background.mapCounter++
+      animationFrameCancelArray.push(background.moveMapFrameAnimation);
+      // console.log(animationFrameCancelArray);
     } else {
+      cancelFramesArray();
+      // console.log(animationFrameCancelArray);
       background.mapCounter = 0;
       background.mapMoving = false;
       link.yMove = backgroundMap.height - link.spriteHeight;
@@ -97,6 +107,10 @@ var background = {
         if (baddy.dead && game.level >= baddy.levelShowUp) {
           baddy.dead = false;
           baddy.life = baddy.maxLife;
+          // if (!keese.dead && game.level >= keese.levelShowUp) {
+          //   // ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
+          //   keese.moveKeese();
+          // };
         };
       });
       if (link.life <= 3) {
@@ -111,7 +125,9 @@ var background = {
       background.yFrame += (background.moveSpeed * 0.6875);
       background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameDown);
       background.mapCounter++
+      animationFrameCancelArray.push(background.moveMapFrameAnimation);
     } else {
+      cancelFramesArray();
       background.mapCounter = 0;
       background.mapMoving = false;
       link.yMove = 0;
@@ -135,7 +151,9 @@ var background = {
       background.xFrame -= background.moveSpeed;
       background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameLeft);
       background.mapCounter++
+      animationFrameCancelArray.push(background.moveMapFrameAnimation);
     } else {
+      cancelFramesArray();
       background.mapCounter = 0;
       background.mapMoving = false;
       link.xMove = backgroundMap.width - link.spriteWidth;
@@ -159,7 +177,9 @@ var background = {
       background.xFrame += background.moveSpeed;
       background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameRight);
       background.mapCounter++
+      animationFrameCancelArray.push(background.moveMapFrameAnimation);
     } else {
+      cancelFramesArray();
       background.mapCounter = 0;
       background.mapMoving = false;
       link.xMove = 0;
@@ -250,11 +270,7 @@ var heart = {
   x: xStarting(20),  //x value where to display heart
   y: yStarting(20),  //y value where to display heart
   show: false,
-  heartAnimation: null,
-
-  generateHeart: function() {
-    this.heartAnimation = window.requestAnimationFrame(heart.generateHeart);
-  }
+  heartAnimation: null
 };
 
 
@@ -285,7 +301,7 @@ var tektite = {
 
   moveTektite: function() {
     //Moves if coinFlip is 1
-    if (coinFlip(65) === 0) {
+    if (coinFlip(60) === 0) {
       var tektiteJump = coinFlip(4);
       if (tektiteJump === 0) {  //for negative x movement
         if (this.xMove >= 64) {
@@ -321,7 +337,6 @@ var tektite = {
         };
       };
     };
-    this.moveAnimation = window.requestAnimationFrame(tektite.moveTektite);
   }
 };
 
@@ -350,7 +365,7 @@ var keese = {
 
   moveKeese: function() {
     //Moves if coinFlip is 1
-    if (coinFlip(30) === 0) {
+    if (coinFlip(25) === 0) {
       var keeseJump = coinFlip(4);
       if (keeseJump === 0) {  //for negative x movement
         if (this.xMove >= 32) {
@@ -370,7 +385,6 @@ var keese = {
         };
       };
     };
-    this.moveAnimation = window.requestAnimationFrame(keese.moveKeese);
   }
 };
 
@@ -412,7 +426,6 @@ var gibdo = {
         this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
       };
     };
-    this.moveAnimation = window.requestAnimationFrame(gibdo.moveGibdo);
   }
 };
 
@@ -455,7 +468,6 @@ var stalfos = {
         this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(1)];
       };
     };
-    this.moveAnimation = window.requestAnimationFrame(stalfos.moveStalfos);
   }
 };
 
@@ -475,7 +487,7 @@ var dodongo = {
   yCenter: 20,  //y center of hit box
   moveAnimation: null,  //movement AI
   moveDirection: [this.xMove, this.yMove], //move directions
-  moveSpeed: 0.75, //number of px to move
+  moveSpeed: 0.8, //number of px to move
   numberOfSpaces: [1], //possible spaces moved
   life: 0,  //how much life
   maxLife: 3,  //how much starting life
@@ -485,7 +497,6 @@ var dodongo = {
 
   moveDodongo: function() {
     this.xMove += this.moveSpeed;
-    this.moveAnimation = window.requestAnimationFrame(dodongo.moveDodongo);
   }
 };
 
@@ -512,10 +523,10 @@ var link = {
   moveSpeed: 3,  //number of px moved per interval
   frameSpeed: 14,  //number to calculate frame switch rate
   isMoving: false, //tracks to see if moving
-  // isMovingUp: false, //tracks to see if moving up
-  // isMovingDown: false, //tracks to see if moving down
-  // isMovingLeft: false, //tracks to see if moving left
-  // isMovingRight: false, //tracks to see if moving right
+  isMovingUp: false, //tracks to see if moving up
+  isMovingDown: false, //tracks to see if moving down
+  isMovingLeft: false, //tracks to see if moving left
+  isMovingRight: false, //tracks to see if moving right
   isAttacking: false, //tracks to see if attacking
   attackTime: null,  //tracks time link attacked
   hitTime: null,  //tracks time link was hit
@@ -561,9 +572,10 @@ var link = {
   // },
 
   moveUp: function() {
-    if (link.yMove <= link.upMapMove && game.score >= game.needToKill) {
+    if (link.yMove <= link.upMapMove && game.score >= game.needToKill && background.yFrame > 0) {
       background.mapMoving = true;
-      window.requestAnimationFrame(background.moveMapFrameUp);
+      background.moveMapFrameUp();
+      return;
     } else if (!background.mapMoving && link.yMove >= 0) {
       link.yMove -= link.moveSpeed;
       link.xFrame = 61;
@@ -578,13 +590,13 @@ var link = {
         link.upFrame = 0;
       };
     };
-    link.moveUpAnimation = window.requestAnimationFrame(link.moveUp);
   },
 
   moveDown: function() {
-      if (link.yMove >= link.downMapMove && game.score >= game.needToKill) {
+      if (link.yMove >= link.downMapMove && game.score >= game.needToKill && background.yFrame < 1232) {
         background.mapMoving = true;
-        window.requestAnimationFrame(background.moveMapFrameDown);
+        background.moveMapFrameDown();
+        return;
       } else if (!background.mapMoving && link.yMove <= 317) {
         link.yMove += link.moveSpeed;
         link.xFrame = 0;
@@ -599,13 +611,13 @@ var link = {
           link.downFrame = 0;
       };
     };
-    link.moveDownAnimation = window.requestAnimationFrame(link.moveDown);
   },
 
   moveLeft: function() {
-    if (link.xMove <= link.leftMapMove && game.score >= game.needToKill) {
+    if (link.xMove <= link.leftMapMove && game.score >= game.needToKill && background.xFrame > 0) {
       background.mapMoving = true;
-      window.requestAnimationFrame(background.moveMapFrameLeft);
+      background.moveMapFrameLeft();
+      return;
     } else if (!background.mapMoving && link.xMove >= 0) {
       link.xMove -= link.moveSpeed;
       link.xFrame = 29;
@@ -620,13 +632,13 @@ var link = {
         link.leftFrame = 0;
       };
     };
-    link.moveLeftAnimation = window.requestAnimationFrame(link.moveLeft);
   },
 
   moveRight: function() {
-    if (link.xMove >= link.rightMapMove && game.score >= game.needToKill) {
+    if (link.xMove >= link.rightMapMove && game.score >= game.needToKill && background.xFrame < 3840) {
       background.mapMoving = true;
-      window.requestAnimationFrame(background.moveMapFrameRight);
+      background.moveMapFrameRight();
+      return;
     } else if (!background.mapMoving&& link.xMove <= 479) {
       link.xMove += link.moveSpeed;
       link.xFrame = 90;
@@ -641,31 +653,30 @@ var link = {
         link.rightFrame = 0;
       };
     };
-    link.moveRightAnimation = window.requestAnimationFrame(link.moveRight);
   },
 
   moveStop: function(event) {
     //Stop moving up
     if(event.keyCode === 38) {
-      window.cancelAnimationFrame(link.moveUpAnimation);
+      link.isMovingUp = false;
       link.isMoving = false;
       link.yFrame = 30;
     };
     //Stop moving down
     if(event.keyCode === 40) {
-      window.cancelAnimationFrame(link.moveDownAnimation);
+      link.isMovingDown = false;
       link.isMoving = false;
       link.yFrame = 0;
     };
     //Stop moving left
     if(event.keyCode === 37) {
-      window.cancelAnimationFrame(link.moveLeftAnimation);
+      link.isMovingLeft = false;
       link.isMoving = false;
       link.yFrame = 0;
     };
     //Stop moving right
     if(event.keyCode === 39) {
-      window.cancelAnimationFrame(link.moveRightAnimation);
+      link.isMovingRight = false;
       link.isMoving = false;
       link.yFrame = 31;
     };
@@ -679,7 +690,6 @@ var link = {
           link.spriteHeight = 34;
           link.yFrame = 30;
           link.yMove += 29;
-          link.isMoving = false;
           link.isAttacking = false;
           break;
           //if facing down
@@ -689,7 +699,6 @@ var link = {
           link.spriteHeight = 34;
           link.yFrame = 0;
           link.yMove -= 3;
-          link.isMoving = false;
           link.isAttacking = false;
           break;
           //if facing left
@@ -699,7 +708,6 @@ var link = {
           link.spriteWidth = 31.875;
           link.yFrame = 0;
           link.xMove += 30;
-          link.isMoving = false;
           link.isAttacking = false;
           break;
           link.yFrame = 100;
@@ -710,7 +718,6 @@ var link = {
           link.spriteWidth = 31.875;
           link.yFrame = 31;
           link.xMove -= 6;
-          link.isMoving = false;
           link.isAttacking = false;
           break;
       };
@@ -723,37 +730,29 @@ var link = {
 var playerAction = function(event) {
   //Up
   if (event.keyCode === 38) {
-    if (link.yMove <= link.upMapMove && game.score >= game.needToKill) {
-      window.requestAnimationFrame(background.moveMapFrameUp);
-    } else if (!link.isMoving && !link.isAttacking && link.yMove >= 1) {
-        window.requestAnimationFrame(link.moveUp);
+    if (!link.isMovingUp && !link.isMoving && !link.isAttacking && link.yMove >= 1) {
+        link.isMovingUp = true;
         link.isMoving = true;
       };
   }
   //Down
   if (event.keyCode === 40) {
-    if (link.yMove >= link.downMapMove && game.score >= game.needToKill) {
-      window.requestAnimationFrame(background.moveMapFrameDown);
-    } else if (!link.isMoving && !link.isAttacking && link.yMove <= 317) {
-        window.requestAnimationFrame(link.moveDown);
+    if (!link.isMovingDown && !link.isMoving && !link.isAttacking && link.yMove <= 317) {
+        link.isMovingDown = true;
         link.isMoving = true;
       };
   }
   //Left
   if (event.keyCode === 37) {
-    if (link.xMove <= link.leftMapMove && game.score >= game.needToKill) {
-      window.requestAnimationFrame(background.moveMapFrameLeft);
-    } else if (!link.isMoving && !link.isAttacking && link.xMove >= 0) {
-        window.requestAnimationFrame(link.moveLeft);
+    if (!link.isMovingLeft && !link.isMoving && !link.isAttacking && link.xMove >= 0) {
+        link.isMovingLeft = true;
         link.isMoving = true;
       };
   }
   //Right
   if (event.keyCode === 39) {
-    if (link.xMove >= link.rightMapMove && game.score >= game.needToKill) {
-      window.requestAnimationFrame(background.moveMapFrameRight);
-    } else if (!link.isMoving && !link.isAttacking && link.xMove <= 479) {
-        window.requestAnimationFrame(link.moveRight);
+    if (!link.isMovingRight && !link.isMoving && !link.isAttacking && link.xMove <= 479) {
+        link.isMovingRight = true;
         link.isMoving = true;
       };
   }
@@ -767,12 +766,9 @@ var playerAction = function(event) {
         link.spriteHeight = 59.5;
         link.yFrame = 84;
         link.yMove -= 29;
-        link.isMoving = true;
+        link.isMovingUp = false;
+        link.isMoving = false;
         link.isAttacking = true;
-        cancelAnimationFrame(link.moveUpAnimation);
-        cancelAnimationFrame(link.moveDownAnimation);
-        cancelAnimationFrame(link.moveLeftAnimation);
-        cancelAnimationFrame(link.moveRightAnimation);
         break;
         //if facing down
       case link.xFrame === 0:
@@ -781,12 +777,9 @@ var playerAction = function(event) {
         link.spriteHeight = 59.5;
         link.yFrame = 84;
         link.yMove += 3;
-        link.isMoving = true;
+        link.isMovingDown = false;
+        link.isMoving = false;
         link.isAttacking = true;
-        cancelAnimationFrame(link.moveUpAnimation);
-        cancelAnimationFrame(link.moveDownAnimation);
-        cancelAnimationFrame(link.moveLeftAnimation);
-        cancelAnimationFrame(link.moveRightAnimation);
         break;
         //if facing left
       case link.xFrame === 29:
@@ -795,12 +788,9 @@ var playerAction = function(event) {
         link.spriteWidth = 59.5;
         link.yFrame = 90;
         link.xMove -= 30;
-        link.isMoving = true;
+        link.isMovingLeft = false;
+        link.isMoving = false;
         link.isAttacking = true;
-        cancelAnimationFrame(link.moveUpAnimation);
-        cancelAnimationFrame(link.moveDownAnimation);
-        cancelAnimationFrame(link.moveLeftAnimation);
-        cancelAnimationFrame(link.moveRightAnimation);
         break;
         //if facing right
       case link.xFrame === 90:
@@ -809,12 +799,9 @@ var playerAction = function(event) {
         link.spriteWidth = 59.5;
         link.yFrame = 90;
         link.xMove += 6;
-        link.isMoving = true;
+        link.isMovingRight = false;
+        link.isMoving = false;
         link.isAttacking = true;
-        cancelAnimationFrame(link.moveUpAnimation);
-        cancelAnimationFrame(link.moveDownAnimation);
-        cancelAnimationFrame(link.moveLeftAnimation);
-        cancelAnimationFrame(link.moveRightAnimation);
         break;
     };
   };
@@ -892,59 +879,62 @@ var pickupCollisionDetection = function(x1, y1, x2, y2, object) {
 };
 
 
-//Animation Loop for player and enemies
+//Animation Game Loop
 var animationLoop = function() {
 
   // game.frame();
 
   ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
-
   ctxBackgroundMap.drawImage(background.image, background.xFrame, background.yFrame, background.pngWidth, background.pngHeight, 0, 0, background.mapWidth, background.mapHeight);
 
-if (heart.show) {
-  ctxBackgroundMap.drawImage(heart.image, heart.xFrame, heart.yFrame, heart.pngWidth, heart.pngHeight, heart.x, heart.y, heart.spriteWidth, heart.spriteHeight);
-  heart.generateHeart();
-} else {
-  cancelAnimationFrame(heart.generateHeart);
-};
+  //Animates hearts
+  if (heart.show) {
+    ctxBackgroundMap.drawImage(heart.image, heart.xFrame, heart.yFrame, heart.pngWidth, heart.pngHeight, heart.x, heart.y, heart.spriteWidth, heart.spriteHeight);
+  };
+  //Animates tektites
+  if (!tektite.dead && game.level >= tektite.levelShowUp) {
+    ctxBackgroundMap.drawImage(tektite.image, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
+    tektite.moveTektite();
+  };
 
-if (!tektite.dead && game.level >= tektite.levelShowUp) {
-  ctxBackgroundMap.drawImage(tektite.image, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
-  tektite.moveTektite();
-} else {
-  cancelAnimationFrame(tektite.moveTektite);
-};
+  //Animates keese
+  if (!keese.dead && game.level >= keese.levelShowUp) {
+    ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
+    keese.moveKeese();
+  };
 
-if (!keese.dead && game.level >= keese.levelShowUp) {
-  ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
-  keese.moveKeese();
-} else {
-  cancelAnimationFrame(keese.moveKeese);
-};
+  //Animates gibdo
+  if (!gibdo.dead && game.level >= gibdo.levelShowUp) {
+    ctxBackgroundMap.drawImage(gibdo.image, gibdo.xFrame, gibdo.yFrame, gibdo.pngWidth, gibdo.pngHeight, gibdo.xMove, gibdo.yMove, gibdo.spriteWidth, gibdo.spriteHeight);
+    gibdo.moveGibdo();
+  };
 
-if (!gibdo.dead && game.level >= gibdo.levelShowUp) {
-  ctxBackgroundMap.drawImage(gibdo.image, gibdo.xFrame, gibdo.yFrame, gibdo.pngWidth, gibdo.pngHeight, gibdo.xMove, gibdo.yMove, gibdo.spriteWidth, gibdo.spriteHeight);
-  gibdo.moveGibdo();
-} else {
-  cancelAnimationFrame(gibdo.moveGibdo);
-};
+  //Animates stalfos
+  if (!stalfos.dead && game.level >= stalfos.levelShowUp) {
+    ctxBackgroundMap.drawImage(stalfos.image, stalfos.xFrame, stalfos.yFrame, stalfos.pngWidth, stalfos.pngHeight, stalfos.xMove, stalfos.yMove, stalfos.spriteWidth, stalfos.spriteHeight);
+    stalfos.moveStalfos();
+  };
 
-if (!stalfos.dead && game.level >= stalfos.levelShowUp) {
-  ctxBackgroundMap.drawImage(stalfos.image, stalfos.xFrame, stalfos.yFrame, stalfos.pngWidth, stalfos.pngHeight, stalfos.xMove, stalfos.yMove, stalfos.spriteWidth, stalfos.spriteHeight);
-  stalfos.moveStalfos();
-} else {
-  cancelAnimationFrame(stalfos.moveStalfos);
-};
+  //Animates dodongo
+  if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove <= 600) {
+    ctxBackgroundMap.drawImage(dodongo.image, dodongo.xFrame, dodongo.yFrame, dodongo.pngWidth, dodongo.pngHeight, dodongo.xMove, dodongo.yMove, dodongo.spriteWidth, dodongo.spriteHeight);
+    dodongo.moveDodongo();
+  };
 
-if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove <= 600) {
-  ctxBackgroundMap.drawImage(dodongo.image, dodongo.xFrame, dodongo.yFrame, dodongo.pngWidth, dodongo.pngHeight, dodongo.xMove, dodongo.yMove, dodongo.spriteWidth, dodongo.spriteHeight);
-  dodongo.moveDodongo();
-} else {
-  cancelAnimationFrame(dodongo.moveDodongo);
-};
-
+  //Animates link
   ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
-
+  if (link.isMovingUp) {
+    link.moveUp();
+  };
+  if (link.isMovingDown) {
+    link.moveDown();
+  };
+  if (link.isMovingLeft) {
+    link.moveLeft();
+  };
+  if (link.isMovingRight) {
+    link.moveRight();
+  };
 
 //Collision checks
   //heart
@@ -960,8 +950,7 @@ if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove <= 600) 
   //dodongo
   enemyCollisionDetection(link.xMove, link.yMove, dodongo.xMove, dodongo.yMove, dodongo);
 
-
-
+//Updates score, high score, level, and kills to advance
   $('#score-num').html(game.score);
   $('#game-num').html(game.level);
   $('#kills-num').html(game.needToKill);
@@ -972,9 +961,8 @@ if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove <= 600) 
 
 //Document ready function for DOM events
 document.addEventListener('DOMContentLoaded', function(event) {
-  window.requestAnimationFrame(animationLoop);
+  animationLoop();
   window.addEventListener('keydown', playerAction);
-  // window.addEventListener('keyup', link.moveStop);
   window.addEventListener('keyup', link.moveStop);
 
 });
