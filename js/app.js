@@ -6,6 +6,7 @@ var game = {
   level: 1,  //which level player is on
   needToKill: 1,  //tracks how many enemies link needs to kill to progress
   now: null,  //current game time
+  endTime: null,  //tracks game end time
   // delta: null,  //change in now and then game time, ie frame rate
   // then: null,  ////previous game time (last frame)
 
@@ -243,6 +244,8 @@ var yStarting = function(spriteHeight) {
 
 
 //Define character images
+var explosionPng = new Image();
+explosionPng.src = '../images/explosion-death.png';
 var linkPng = new Image();
 linkPng.src = '../images/link-spritesheet.png';
 
@@ -637,10 +640,6 @@ var link = {
     }
   },
 
-  // die: function() {
-  //
-  // },
-
   moveUp: function() {
     if (link.yMove <= link.upMapMove && game.score >= game.needToKill && background.yFrame > 0) {
       background.mapMoving = true;
@@ -649,7 +648,7 @@ var link = {
       link.yMove -= link.moveSpeed;
       link.xFrame = 61;
       link.yFrame = 0;
-      if (link.upFrame < (link.frameSpeed / 2)){
+      if (link.upFrame < (link.frameSpeed / 2)) {
         link.yFrame = 30;
         link.upFrame++;
       } else if(link.upFrame <= link.frameSpeed) {
@@ -669,7 +668,7 @@ var link = {
         link.yMove += link.moveSpeed;
         link.xFrame = 0;
         link.yFrame = 0;
-        if (link.downFrame < (link.frameSpeed / 2)){
+        if (link.downFrame < (link.frameSpeed / 2)) {
           link.yFrame = 30;
           link.downFrame++;
         } else if(link.downFrame <= link.frameSpeed) {
@@ -689,7 +688,7 @@ var link = {
       link.xMove -= link.moveSpeed;
       link.xFrame = 29;
       link.yFrame = 31;
-      if (link.leftFrame < (link.frameSpeed * .5)){
+      if (link.leftFrame < (link.frameSpeed * .5)) {
         link.yFrame = 0;
         link.leftFrame++;
       } else if(link.leftFrame <= link.frameSpeed) {
@@ -709,7 +708,7 @@ var link = {
       link.xMove += link.moveSpeed;
       link.xFrame = 90;
       link.yFrame = 0;
-      if (link.rightFrame < (link.frameSpeed / 2)){
+      if (link.rightFrame < (link.frameSpeed / 2)) {
         link.yFrame = 31;
         link.rightFrame++;
       } else if(link.rightFrame <= link.frameSpeed) {
@@ -943,18 +942,46 @@ var pickupCollisionDetection = function(x1, y1, x2, y2, object) {
 };
 
 
-//Game over function
+//Game over functions
+  //link death spin
+var linkDies = function() {
+  ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+  ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
+  if (link.xFrame === 0 && link.yFrame === 0) {
+    link.xFrame = 90;
+    link.yFrame = 31;
+  } else if (link.xFrame === 90 && link.yFrame === 31) {
+    link.xFrame = 61;
+    link.yFrame = 0;
+  } else if (link.xFrame === 61 && link.yFrame === 0) {
+    link.xFrame = 29;
+    link.yFrame = 0;
+  } else if (link.xFrame === 29 && link.yFrame === 0) {
+    link.xFrame = 0;
+    link.yFrame = 0;
+  };
+};
+
+  //game over function and link explosion
 var gameOver = function() {
   cancelAnimationFrame(animateGame);
   ctxEnemyMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+  ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
   deathCanvas.style.opacity = '0.56';
-  // ctxBackgroundMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
-
+  link.xFrame = 0;
+  link.yFrame = 0;
+  var animateLinkDeath = setInterval(linkDies, .5);
+  setTimeout(function() {
+    clearInterval(animateLinkDeath);
+    ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+    ctxSpriteMap.drawImage(explosionPng, 40, 10, 280, 285, link.xMove, link.yMove, 60, 60);
+  }, 2000);
 };
 
 
 //Animation Game Loop
 var animateGame = null;
+
 var animationLoop = function() {
 
   if (link.life <= 0) {
@@ -968,6 +995,7 @@ var animationLoop = function() {
     ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
     ctxBackgroundMap.drawImage(background.image, background.xFrame, background.yFrame, background.pngWidth, background.pngHeight, 0, 0, background.mapWidth, background.mapHeight);
 
+    //up map frame counter, call, and stop
     if (background.moveMapUp) {
       if (background.mapCounter < 64) {
         background.moveMapFrameUpStart();
@@ -976,6 +1004,7 @@ var animationLoop = function() {
       };
     };
 
+    //down map frame counter, call, and stop
     if (background.moveMapDown) {
       if (background.mapCounter < 64) {
         background.moveMapFrameDownStart();
@@ -984,6 +1013,7 @@ var animationLoop = function() {
       };
     };
 
+    //left map frame counter, call, and stop
     if (background.moveMapLeft) {
       if (background.mapCounter < 64) {
         background.moveMapFrameLeftStart();
@@ -992,6 +1022,7 @@ var animationLoop = function() {
       };
     };
 
+    //right map frame counter, call, and stop
     if (background.moveMapRight) {
       if (background.mapCounter < 64) {
         background.moveMapFrameRightStart();
@@ -1077,8 +1108,8 @@ var animationLoop = function() {
     animateGame = requestAnimationFrame(animationLoop);
 
   } else if (game.over) {
+    game.endTime = Date.now();
     gameOver();
-    // animateGame = requestAnimationFrame(animationLoop);
   };
 
 };
