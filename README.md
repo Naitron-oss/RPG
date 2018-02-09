@@ -50,12 +50,60 @@ Prevent Link from moving diagonally
 -~-COMPLETE - as part of sword attack, tho movement is a little stiff now
 
 
+Step 10:
+Add an enemy
+-~-COMPLETE
+
+Step 11:
+Add life to link and enemy
+-~-COMPLETE
+
+Step 12:
+Add collision detection between link and enemy
+-~-COMPLETE
+
+Step 13:
+Add hearts so link can gain life
+//add collision detection between hearts and link
+-~-COMPLETE
+
+Step 14:
+Add keese, gibdo, stalfos
+//give each their own AI so they are their own character
+-~-COMPLETE
+
+Step ??:
+Add ___ bad guys????
+
+Step ??:
+How do you win????
+
+Step ??:
+Add link and enemy death animations
+
+Step ??:
+Complete layout of page
+
+Step ??:
+Add title screen
+
+Step ??:
+Add game over screen
+
+Step ??:
+Add a place to enter players name
+
+Step ??:
+Add local storage to store players name and high score
+
+
+
+
+
 Step ??:
 Make map key where Link and enemies can/can't be on
 Also include tiles that trigger map/dungeon frame moves
 //Each map frame is 256x176 ratio
 //Each map frame has 16 tiles on x axis, and 11 tiles on y axis
 //Each tile is 16x16
-
-Step ??:
-How do you win????
+-~-SCRATCHED...WENT ANOTHER DIRECTION WITH GAME
