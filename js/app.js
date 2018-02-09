@@ -3,6 +3,7 @@
 //found online, thanks to Dan Tello
 var game = {
   score: 0,  //tracks current kill score
+  level: 1,  //which level player is on
   needToKill: 1,  //tracks how many enemies link needs to kill to progress
   now: null,  //current game time
   delta: null,  //change in now and then game time, ie frame rate
@@ -19,6 +20,41 @@ var game = {
     game.now = Date.now();
     game.delta = (game.now - game.then) / 1000; //seconds since last frame
     game.then = game.now;
+  },
+
+  setNeedToKill: function() {
+    switch (true) {
+      case this.level === 1:
+        this.needToKill = 1;
+        break;
+      case this.level === 2:
+        this.needToKill = 3;
+        break;
+      case this.level === 3:
+        this.needToKill = 6;
+        break;
+      case this.level === 4:
+        this.needToKill = 10;
+        break;
+      case this.level === 5:
+        this.needToKill = 15;
+        break;
+      case this.level === 6:
+        this.needToKill = 6;
+        break;
+      case this.level === 7:
+        this.needToKill = 7;
+        break;
+      case this.level === 8:
+        this.needToKill = 8;
+        break;
+      case this.level === 9:
+        this.needToKill = 9;
+        break;
+      case this.level === 10:
+        this.needToKill = 10;
+        break;
+    };
   }
 };
 
@@ -55,26 +91,14 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.yMove = backgroundMap.height - link.spriteHeight;
-      game.needToKill += 1;
-      if (tektite.dead) {
-        tektite.dead = false;
-        tektite.life = 1;
-      };
-      if (keese.dead) {
-        keese.dead = false;
-        keese.life = 1;
-      };
-      if (gibdo.dead && game.needToKill >= 3) {
-        gibdo.dead = false;
-      gibdo.life = 1;
-    };
-      if (stalfos.dead && game.needToKill >4) {
-        stalfos.dead = false;
-        stalfos.life = 2;
-      };
-      if (link.life <= 2) {
-        heart.show = true;
-      };
+      game.level += 1;
+      game.setNeedToKill();
+      allEnemies.forEach(function(baddy) {
+        if (baddy.dead && game.level >= baddy.levelShowUp) {
+          baddy.dead = false;
+          baddy.life = baddy.maxLife;
+        };
+      });
     };
   },
 
@@ -88,26 +112,14 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.yMove = 0;
-      game.needToKill += 1;
-      if (tektite.dead) {
-        tektite.dead = false;
-        tektite.life = 1;
-      };
-      if (keese.dead) {
-        keese.dead = false;
-        keese.life = 1;
-      };
-      if (gibdo.dead && game.needToKill >= 3) {
-        gibdo.dead = false;
-      gibdo.life = 1;
-    };
-      if (stalfos.dead && game.needToKill >4) {
-        stalfos.dead = false;
-        stalfos.life = 2;
-      };
-      if (link.life <= 2) {
-        heart.show = true;
-      };
+      game.level += 1;
+      game.setNeedToKill();
+      allEnemies.forEach(function(baddy) {
+        if (baddy.dead && game.level >= baddy.levelShowUp) {
+          baddy.dead = false;
+          baddy.life = baddy.maxLife;
+        };
+      });
     };
   },
 
@@ -121,26 +133,14 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.xMove = backgroundMap.width - link.spriteWidth;
-      game.needToKill += 1;
-      if (tektite.dead) {
-        tektite.dead = false;
-        tektite.life = 1;
-      };
-      if (keese.dead) {
-        keese.dead = false;
-        keese.life = 1;
-      };
-      if (gibdo.dead && game.needToKill >= 3) {
-        gibdo.dead = false;
-      gibdo.life = 1;
-    };
-      if (stalfos.dead && game.needToKill > 4) {
-        stalfos.dead = false;
-        stalfos.life = 2;
-      };
-      if (link.life <= 2) {
-        heart.show = true;
-      };
+      game.level += 1;
+      game.setNeedToKill();
+      allEnemies.forEach(function(baddy) {
+        if (baddy.dead && game.level >= baddy.levelShowUp) {
+          baddy.dead = false;
+          baddy.life = baddy.maxLife;
+        };
+      });
     };
   },
 
@@ -154,26 +154,14 @@ var background = {
       background.mapCounter = 0;
       background.mapMoving = false;
       link.xMove = 0;
-      game.needToKill += 1;
-      if (tektite.dead) {
-        tektite.dead = false;
-        tektite.life = 1;
-      };
-      if (keese.dead) {
-        keese.dead = false;
-        keese.life = 1;
-      };
-      if (gibdo.dead && game.needToKill >= 3) {
-        gibdo.dead = false;
-      gibdo.life = 1;
-    };
-      if (stalfos.dead && game.needToKill >4) {
-        stalfos.dead = false;
-        stalfos.life = 2;
-      };
-      if (link.life <= 2) {
-        heart.show = true;
-      };
+      game.level += 1;
+      game.setNeedToKill();
+      allEnemies.forEach(function(baddy) {
+        if (baddy.dead && game.level >= baddy.levelShowUp) {
+          baddy.dead = false;
+          baddy.life = baddy.maxLife;
+        };
+      });
     };
   }
 };
@@ -231,6 +219,9 @@ gibdoPng.src = '../images/gibdo.png';
 var stalfosPng = new Image();
 stalfosPng.src = '../images/stalfos.png';
 
+var dodongoPng = new Image();
+dodongoPng.src = '../images/dodongo.png';
+
 var heartPng = new Image();
 heartPng.src = '../images/heart.gif';
 
@@ -274,9 +265,11 @@ var tektite = {
   moveDirection: [this.xMove, this.yMove], //move directions
   moveSpeed: 16, //number of px to move
   numberOfSpaces: [0, 1, 2, 3], //possible spaces moved
-  life: 1,  //how much life
+  life: 1,  //how much current life
+  maxLife: 1,  //how much starting life is
   dead: false,  //tracks if dead or not
   points: 1,  //how many points killing tektite is worth
+  levelShowUp: 1,  //first level seen
 
   moveTektite: function() {
     //Moves if coinFlip is 1
@@ -337,9 +330,11 @@ var keese = {
   moveDirection: [this.xMove, this.yMove], //move directions
   moveSpeed: 16, //number of px to move
   numberOfSpaces: [0, 1], //possible spaces moved
-  life: 0,  //how much life
+  life: 0,  //how much current life
+  maxLife: 1,  //how much starting life
   dead: true,  //tracks if dead or not
   points: 1,  //how many points killing keese is worth
+  levelShowUp: 2,  //first level seen
 
   moveKeese: function() {
     //Moves if coinFlip is 1
@@ -385,8 +380,10 @@ var gibdo = {
   moveSpeed: 1, //number of px to move
   numberOfSpaces: [0, 1], //possible spaces moved
   life: 0,  //how much life
+  maxLife: 2,  //how much starting life
   dead: true,  //tracks if dead or not
   points: 1,  //how many points killing gibdo is worth
+  levelShowUp: 3,  //first level seen
 
   moveGibdo: function() {
     //Moves if coinFlip is 1
@@ -423,31 +420,66 @@ var stalfos = {
   yCenter: 20,  //y center of hit box
   moveAnimation: null,  //movement AI
   moveDirection: [this.xMove, this.yMove], //move directions
-  moveSpeed: 1, //number of px to move
-  numberOfSpaces: [0, 1], //possible spaces moved
-  life: 2,  //how much life
-  dead: false,  //tracks if dead or not
+  moveSpeed: 1.5, //number of px to move
+  numberOfSpaces: [1], //possible spaces moved
+  life: 0,  //how much life
+  maxLife: 1,  //how much starting life
+  dead: true,  //tracks if dead or not
   points: 1,  //how many points killing stalfos is worth
+  levelShowUp: 4,  //first level seen
 
   moveStalfos: function() {
     //Moves if coinFlip is 1
     if (coinFlip(2) === 0) {
       if (this.xMove - link.xMove >= 0) {
-        this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(1)];
       } else if (this.xMove - link.xMove < 0) {
-        this.xMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        this.xMove += this.moveSpeed * this.numberOfSpaces[coinFlip(1)];
       }
     } else if (coinFlip(2) === 1) {
       if (this.yMove - link.yMove >= 0) {
-        this.yMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        this.yMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(1)];
       } else if (this.yMove - link.yMove < 0) {
-        this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
+        this.yMove += this.moveSpeed * this.numberOfSpaces[coinFlip(1)];
       };
     };
     this.moveAnimation = window.requestAnimationFrame(stalfos.moveStalfos);
   }
 };
 
+
+//dinosaur creature, moves normal across the screen, L to R
+var dodongo = {
+  image: dodongoPng,
+  xFrame: 0,  //x starting point of src img for sprite frame
+  yFrame: 0,  //y starting point of src img for sprite frame
+  pngWidth: 32,  //width of src img sprite size
+  pngHeight: 16,  //height of src img sprite size
+  spriteWidth: 90,  //width of sprite on canvas
+  spriteHeight: 45,  //height of sprite on canvas
+  xMove:   -100,  //x point of dodongo on canvas
+  yMove:   yStarting(50),  //y point of dodongo on canvas
+  xCenter: 18.75,  //x center of hit box
+  yCenter: 20,  //y center of hit box
+  moveAnimation: null,  //movement AI
+  moveDirection: [this.xMove, this.yMove], //move directions
+  moveSpeed: 1, //number of px to move
+  numberOfSpaces: [1], //possible spaces moved
+  life: 0,  //how much life
+  maxLife: 3,  //how much starting life
+  dead: false,  //tracks if dead or not
+  points: 3,  //how many points killing dodongo is worth
+  levelShowUp: 5,  //first level seen
+
+  moveDodongo: function() {
+    this.xMove += this.moveSpeed;
+    this.moveAnimation = window.requestAnimationFrame(dodongo.moveDodongo);
+  }
+};
+
+
+//All enemies array
+var allEnemies = [tektite, keese, gibdo, stalfos, dodongo];
 
 
 //Player, aka Link
@@ -858,25 +890,32 @@ if (!tektite.dead) {
   cancelAnimationFrame(tektite.moveTektite);
 };
 
-if (!keese.dead && game.needToKill >= 2) {
+if (!keese.dead && game.level >= 2) {
   ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
   keese.moveKeese();
 } else {
   cancelAnimationFrame(keese.moveKeese);
 };
 
-if (!gibdo.dead && game.needToKill >= 2) {
+if (!gibdo.dead && game.level >= 3) {
   ctxBackgroundMap.drawImage(gibdo.image, gibdo.xFrame, gibdo.yFrame, gibdo.pngWidth, gibdo.pngHeight, gibdo.xMove, gibdo.yMove, gibdo.spriteWidth, gibdo.spriteHeight);
   gibdo.moveGibdo();
 } else {
   cancelAnimationFrame(gibdo.moveGibdo);
 };
 
-if (!stalfos.dead && game.needToKill >= 0) {
+if (!stalfos.dead && game.level >= 4) {
   ctxBackgroundMap.drawImage(stalfos.image, stalfos.xFrame, stalfos.yFrame, stalfos.pngWidth, stalfos.pngHeight, stalfos.xMove, stalfos.yMove, stalfos.spriteWidth, stalfos.spriteHeight);
   stalfos.moveStalfos();
 } else {
   cancelAnimationFrame(stalfos.moveStalfos);
+};
+
+if (!dodongo.dead && game.level >= 0 && dodongo.xMove <= 600) {
+  ctxBackgroundMap.drawImage(dodongo.image, dodongo.xFrame, dodongo.yFrame, dodongo.pngWidth, dodongo.pngHeight, dodongo.xMove, dodongo.yMove, dodongo.spriteWidth, dodongo.spriteHeight);
+  dodongo.moveDodongo();
+} else {
+  cancelAnimationFrame(dodongo.moveDodongo);
 };
 
   ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
@@ -893,10 +932,15 @@ if (!stalfos.dead && game.needToKill >= 0) {
   enemyCollisionDetection(link.xMove, link.yMove, gibdo.xMove, gibdo.yMove, gibdo);
   //stalfos
   enemyCollisionDetection(link.xMove, link.yMove, stalfos.xMove, stalfos.yMove, stalfos);
+  //dodongo
+  enemyCollisionDetection(link.xMove, link.yMove, dodongo.xMove, dodongo.yMove, dodongo);
 
 
 
   $('#score-num').html(game.score);
+  $('#game-num').html(game.level);
+  $('#kills-num').html(game.needToKill);
+  //$('#high-score').html()
   requestAnimationFrame(animationLoop);
 };
 

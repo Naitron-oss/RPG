@@ -2,6 +2,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #1F1F1F;
+  font-family: 'Press Start 2P', cursive;
 }
 
 .topspace {
@@ -24,6 +25,7 @@ body {
 
 .left-side {
   margin: 0;
+  padding-top: 10px;
   height: 100%;
   width: 100%;
   text-align: left;
@@ -33,11 +35,16 @@ body {
 }
 
 .left-side p {
+  font-size: 11px;
   color: #a8c65e;
   text-align: center;
 }
 
 #player-name {
+  font-weight: bold;
+}
+
+#game-num {
   font-weight: bold;
 }
 
