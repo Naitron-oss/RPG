@@ -251,6 +251,10 @@ var yStarting = function(spriteHeight) {
 //Define character images
 var explosionPng = new Image();
 explosionPng.src = '../images/explosion-death.png';
+
+var explosionGif = new Image();
+explosionGif.src = '../images/explosion-gif.gif';
+
 var linkPng = new Image();
 linkPng.src = '../images/link-spritesheet.png';
 
@@ -1079,7 +1083,9 @@ var animationLoop = function() {
       resetOffscreenEnemies(dodongo);
     };
 
-    //Animates link
+    //Animates link and explosion steps
+    // ctxSpriteMap.drawImage(explosionGif, 10, 0, 190, 250, 150, 150, 15.2, 20);
+
     ctxSpriteMap.drawImage(link.image, link.xFrame, link.yFrame, link.pngWidth, link.pngHeight, link.xMove, link.yMove, link.spriteWidth, link.spriteHeight);
     link.invincible = $('#invincible').prop('checked');
 
@@ -1150,6 +1156,7 @@ var replayGame = function() {
     background.xFrame = xMapStart();
     background.yFrame = yMapStart();
     deathCanvas.style.opacity = '0';
+    ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
     animationLoop();
   };
 };
