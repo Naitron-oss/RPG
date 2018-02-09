@@ -1,26 +1,30 @@
 
-//Game time
-//found online, thanks to Dan Tello
+//Game info and functions
 var game = {
   score: 0,  //tracks current kill score
   level: 1,  //which level player is on
   needToKill: 1,  //tracks how many enemies link needs to kill to progress
   now: null,  //current game time
-  delta: null,  //change in now and then game time, ie frame rate
-  then: null,  ////previous game time (last frame)
+  // delta: null,  //change in now and then game time, ie frame rate
+  // then: null,  ////previous game time (last frame)
 
-  frame: function() {
-    game.setDelta();
-    // game.update();
-    // game.render();
-    game.animationFrame = window.requestAnimationFrame(game.frame);
-  },
-
-  setDelta: function() {
+  setGameNow: function() {
     game.now = Date.now();
-    game.delta = (game.now - game.then) / 1000; //seconds since last frame
-    game.then = game.now;
   },
+
+//found online, thanks to Dan Tello
+  // frame: function() {
+  //   game.setDelta();
+  //   // game.update();
+  //   // game.render();
+  //   game.animationFrame = window.requestAnimationFrame(game.frame);
+  // },
+
+  // setDelta: function() {
+  //   game.now = Date.now();
+  //   game.delta = (game.now - game.then) / 1000; //seconds since last frame
+  //   game.then = game.now;
+  // },
 
   setNeedToKill: function() {
     switch (true) {
@@ -58,14 +62,6 @@ var game = {
   }
 };
 
-game.frame();
-
-var animationFrameCancelArray = [];
-var cancelFramesArray = function() {
-  while (animationFrameCancelArray.length > 0) {
-    window.cancelAnimationFrame(animationFrameCancelArray.pop());
-  }
-};
 
 //Defining backgroundMap canvas
 var backgroundMap = document.getElementById('background-map');
@@ -74,6 +70,8 @@ var backgroundImage = new Image();
 backgroundImage.src = '../images/overworld_map.png';
 backgroundMap.width = 512;
 backgroundMap.height = 352;
+
+
 var background = {
   image: backgroundImage,
   xFrame: 2816,  //x axis start of current map frame (from src img)
@@ -85,115 +83,109 @@ var background = {
   mapWidth: backgroundMap.width,  //how wide the background will be on canvas
   mapHeight: backgroundMap.height,  //how tall the background will be on canvas
   moveMapFrameAnimation: null,
-  mapMoving: false,
+  mapMoving: false,  //tracks if map is moving
+  moveMapUp: false,  //turns on map moving up
+  moveMapDown: false,  //turns on map moving down
+  moveMapLeft: false,  //turns on map moving left
+  moveMapRight: false,  //turns on map moving right
 
-  moveMapFrameUp: function() {
-    if (background.mapCounter < 64) {
+  moveMapFrameUpStart: function() {
       link.yMove += (background.moveSpeed * 1.25);
       background.yFrame -= (background.moveSpeed * 0.6875);
-      background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameUp);
       background.mapCounter++
-      animationFrameCancelArray.push(background.moveMapFrameAnimation);
-      // console.log(animationFrameCancelArray);
-    } else {
-      cancelFramesArray();
-      // console.log(animationFrameCancelArray);
-      background.mapCounter = 0;
-      background.mapMoving = false;
-      link.yMove = backgroundMap.height - link.spriteHeight;
-      game.level += 1;
-      game.setNeedToKill();
-      allEnemies.forEach(function(baddy) {
-        if (baddy.dead && game.level >= baddy.levelShowUp) {
-          baddy.dead = false;
-          baddy.life = baddy.maxLife;
-          // if (!keese.dead && game.level >= keese.levelShowUp) {
-          //   // ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
-          //   keese.moveKeese();
-          // };
-        };
-      });
-      if (link.life <= 3) {
-        heart.show = true;
+    },
+
+  moveMapFrameUpStop: function() {
+    background.mapCounter = 0;
+    background.mapMoving = false;
+    background.moveMapUp = false;
+    link.yMove = backgroundMap.height - link.spriteHeight;
+    game.level += 1;
+    game.setNeedToKill();
+    allEnemies.forEach(function(baddy) {
+      if (baddy.dead && game.level >= baddy.levelShowUp) {
+        baddy.dead = false;
+        baddy.life = baddy.maxLife;
+        // if (!keese.dead && game.level >= keese.levelShowUp) {
+        //   // ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
+        //   keese.moveKeese();
+        // };
       };
+    });
+    if (link.life <= 3) {
+      heart.show = true;
     };
   },
 
-  moveMapFrameDown: function() {
-    if (background.mapCounter < 64) {
+  moveMapFrameDownStart: function() {
       link.yMove -= (background.moveSpeed * 1.25);
       background.yFrame += (background.moveSpeed * 0.6875);
-      background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameDown);
       background.mapCounter++
-      animationFrameCancelArray.push(background.moveMapFrameAnimation);
-    } else {
-      cancelFramesArray();
-      background.mapCounter = 0;
-      background.mapMoving = false;
-      link.yMove = 0;
-      game.level += 1;
-      game.setNeedToKill();
-      allEnemies.forEach(function(baddy) {
-        if (baddy.dead && game.level >= baddy.levelShowUp) {
-          baddy.dead = false;
-          baddy.life = baddy.maxLife;
-        };
-      });
-      if (link.life <= 3) {
-        heart.show = true;
+    },
+
+  moveMapFrameDownStop: function() {
+    background.mapCounter = 0;
+    background.mapMoving = false;
+    background.moveMapDown = false;
+    link.yMove = 0;
+    game.level += 1;
+    game.setNeedToKill();
+    allEnemies.forEach(function(baddy) {
+      if (baddy.dead && game.level >= baddy.levelShowUp) {
+        baddy.dead = false;
+        baddy.life = baddy.maxLife;
       };
+    });
+    if (link.life <= 3) {
+      heart.show = true;
     };
   },
 
-  moveMapFrameLeft:function() {
-    if (background.mapCounter < 64) {
-      link.xMove += (background.moveSpeed * 1.85);
-      background.xFrame -= background.moveSpeed;
-      background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameLeft);
-      background.mapCounter++
-      animationFrameCancelArray.push(background.moveMapFrameAnimation);
-    } else {
-      cancelFramesArray();
-      background.mapCounter = 0;
-      background.mapMoving = false;
-      link.xMove = backgroundMap.width - link.spriteWidth;
-      game.level += 1;
-      game.setNeedToKill();
-      allEnemies.forEach(function(baddy) {
-        if (baddy.dead && game.level >= baddy.levelShowUp) {
-          baddy.dead = false;
-          baddy.life = baddy.maxLife;
-        };
-      });
-      if (link.life <= 3) {
-        heart.show = true;
+  moveMapFrameLeftStart: function() {
+    link.xMove += (background.moveSpeed * 1.85);
+    background.xFrame -= background.moveSpeed;
+    background.mapCounter++
+    },
+
+  moveMapFrameLeftStop: function() {
+    background.mapCounter = 0;
+    background.mapMoving = false;
+    background.moveMapLeft = false;
+    link.xMove = backgroundMap.width - link.spriteWidth;
+    game.level += 1;
+    game.setNeedToKill();
+    allEnemies.forEach(function(baddy) {
+      if (baddy.dead && game.level >= baddy.levelShowUp) {
+        baddy.dead = false;
+        baddy.life = baddy.maxLife;
       };
+    });
+    if (link.life <= 3) {
+      heart.show = true;
     };
   },
 
-  moveMapFrameRight: function() {
-    if (background.mapCounter < 64) {
-      link.xMove -= (background.moveSpeed * 1.85);
-      background.xFrame += background.moveSpeed;
-      background.moveMapFrameAnimation = window.requestAnimationFrame(background.moveMapFrameRight);
-      background.mapCounter++
-      animationFrameCancelArray.push(background.moveMapFrameAnimation);
-    } else {
-      cancelFramesArray();
-      background.mapCounter = 0;
-      background.mapMoving = false;
-      link.xMove = 0;
-      game.level += 1;
-      game.setNeedToKill();
-      allEnemies.forEach(function(baddy) {
-        if (baddy.dead && game.level >= baddy.levelShowUp) {
-          baddy.dead = false;
-          baddy.life = baddy.maxLife;
-        };
-      });
-      if (link.life <= 3) {
-        heart.show = true;
+  moveMapFrameRightStart: function() {
+    link.xMove -= (background.moveSpeed * 1.85);
+    background.xFrame += background.moveSpeed;
+    background.mapCounter++
+  },
+
+  moveMapFrameRightStop: function() {
+    background.mapCounter = 0;
+    background.mapMoving = false;
+    background.moveMapRight = false;
+    link.xMove = 0;
+    game.level += 1;
+    game.setNeedToKill();
+    allEnemies.forEach(function(baddy) {
+      if (baddy.dead && game.level >= baddy.levelShowUp) {
+        baddy.dead = false;
+        baddy.life = baddy.maxLife;
       };
+    });
+    if (link.life <= 3) {
+      heart.show = true;
     };
   }
 };
@@ -574,8 +566,7 @@ var link = {
   moveUp: function() {
     if (link.yMove <= link.upMapMove && game.score >= game.needToKill && background.yFrame > 0) {
       background.mapMoving = true;
-      background.moveMapFrameUp();
-      return;
+      background.moveMapUp = true;
     } else if (!background.mapMoving && link.yMove >= 0) {
       link.yMove -= link.moveSpeed;
       link.xFrame = 61;
@@ -595,8 +586,7 @@ var link = {
   moveDown: function() {
       if (link.yMove >= link.downMapMove && game.score >= game.needToKill && background.yFrame < 1232) {
         background.mapMoving = true;
-        background.moveMapFrameDown();
-        return;
+        background.moveMapDown = true;
       } else if (!background.mapMoving && link.yMove <= 317) {
         link.yMove += link.moveSpeed;
         link.xFrame = 0;
@@ -616,8 +606,7 @@ var link = {
   moveLeft: function() {
     if (link.xMove <= link.leftMapMove && game.score >= game.needToKill && background.xFrame > 0) {
       background.mapMoving = true;
-      background.moveMapFrameLeft();
-      return;
+      background.moveMapLeft = true;
     } else if (!background.mapMoving && link.xMove >= 0) {
       link.xMove -= link.moveSpeed;
       link.xFrame = 29;
@@ -637,9 +626,8 @@ var link = {
   moveRight: function() {
     if (link.xMove >= link.rightMapMove && game.score >= game.needToKill && background.xFrame < 3840) {
       background.mapMoving = true;
-      background.moveMapFrameRight();
-      return;
-    } else if (!background.mapMoving&& link.xMove <= 479) {
+      background.moveMapRight = true;
+    } else if (!background.mapMoving && link.xMove <= 479) {
       link.xMove += link.moveSpeed;
       link.xFrame = 90;
       link.yFrame = 0;
@@ -655,7 +643,88 @@ var link = {
     };
   },
 
-  moveStop: function(event) {
+  //Player move Function
+  playerAction: function(event) {
+    //Up
+    if (event.keyCode === 38) {
+      if (!link.isMovingUp && !link.isMoving && !link.isAttacking && link.yMove >= 1) {
+          link.isMovingUp = true;
+          link.isMoving = true;
+        };
+    }
+    //Down
+    if (event.keyCode === 40) {
+      if (!link.isMovingDown && !link.isMoving && !link.isAttacking && link.yMove <= 317) {
+          link.isMovingDown = true;
+          link.isMoving = true;
+        };
+    }
+    //Left
+    if (event.keyCode === 37) {
+      if (!link.isMovingLeft && !link.isMoving && !link.isAttacking && link.xMove >= 0) {
+          link.isMovingLeft = true;
+          link.isMoving = true;
+        };
+    }
+    //Right
+    if (event.keyCode === 39) {
+      if (!link.isMovingRight && !link.isMoving && !link.isAttacking && link.xMove <= 479) {
+          link.isMovingRight = true;
+          link.isMoving = true;
+        };
+    }
+    //Spacebar
+    if (event.keyCode === 32) {
+      switch(true) {
+        //if facing up
+        case link.xFrame === 61:
+          link.xFrame = 60;
+          link.pngHeight = 28;
+          link.spriteHeight = 59.5;
+          link.yFrame = 84;
+          link.yMove -= 29;
+          link.isMovingUp = false;
+          link.isMoving = false;
+          link.isAttacking = true;
+          break;
+          //if facing down
+        case link.xFrame === 0:
+          link.pngWidth = 16;
+          link.pngHeight = 28;
+          link.spriteHeight = 59.5;
+          link.yFrame = 84;
+          link.yMove += 3;
+          link.isMovingDown = false;
+          link.isMoving = false;
+          link.isAttacking = true;
+          break;
+          //if facing left
+        case link.xFrame === 29:
+          link.xFrame = 24;
+          link.pngWidth = 28;
+          link.spriteWidth = 59.5;
+          link.yFrame = 90;
+          link.xMove -= 30;
+          link.isMovingLeft = false;
+          link.isMoving = false;
+          link.isAttacking = true;
+          break;
+          //if facing right
+        case link.xFrame === 90:
+          link.xFrame = 84;
+          link.pngWidth = 28;
+          link.spriteWidth = 59.5;
+          link.yFrame = 90;
+          link.xMove += 6;
+          link.isMovingRight = false;
+          link.isMoving = false;
+          link.isAttacking = true;
+          break;
+      };
+    };
+  },
+
+  actionStop: function(event) {
     //Stop moving up
     if(event.keyCode === 38) {
       link.isMovingUp = false;
@@ -723,88 +792,6 @@ var link = {
       };
     };
   }
-};
-
-
-//Player move Function
-var playerAction = function(event) {
-  //Up
-  if (event.keyCode === 38) {
-    if (!link.isMovingUp && !link.isMoving && !link.isAttacking && link.yMove >= 1) {
-        link.isMovingUp = true;
-        link.isMoving = true;
-      };
-  }
-  //Down
-  if (event.keyCode === 40) {
-    if (!link.isMovingDown && !link.isMoving && !link.isAttacking && link.yMove <= 317) {
-        link.isMovingDown = true;
-        link.isMoving = true;
-      };
-  }
-  //Left
-  if (event.keyCode === 37) {
-    if (!link.isMovingLeft && !link.isMoving && !link.isAttacking && link.xMove >= 0) {
-        link.isMovingLeft = true;
-        link.isMoving = true;
-      };
-  }
-  //Right
-  if (event.keyCode === 39) {
-    if (!link.isMovingRight && !link.isMoving && !link.isAttacking && link.xMove <= 479) {
-        link.isMovingRight = true;
-        link.isMoving = true;
-      };
-  }
-  //Spacebar
-  if (event.keyCode === 32) {
-    switch(true) {
-      //if facing up
-      case link.xFrame === 61:
-        link.xFrame = 60;
-        link.pngHeight = 28;
-        link.spriteHeight = 59.5;
-        link.yFrame = 84;
-        link.yMove -= 29;
-        link.isMovingUp = false;
-        link.isMoving = false;
-        link.isAttacking = true;
-        break;
-        //if facing down
-      case link.xFrame === 0:
-        link.pngWidth = 16;
-        link.pngHeight = 28;
-        link.spriteHeight = 59.5;
-        link.yFrame = 84;
-        link.yMove += 3;
-        link.isMovingDown = false;
-        link.isMoving = false;
-        link.isAttacking = true;
-        break;
-        //if facing left
-      case link.xFrame === 29:
-        link.xFrame = 24;
-        link.pngWidth = 28;
-        link.spriteWidth = 59.5;
-        link.yFrame = 90;
-        link.xMove -= 30;
-        link.isMovingLeft = false;
-        link.isMoving = false;
-        link.isAttacking = true;
-        break;
-        //if facing right
-      case link.xFrame === 90:
-        link.xFrame = 84;
-        link.pngWidth = 28;
-        link.spriteWidth = 59.5;
-        link.yFrame = 90;
-        link.xMove += 6;
-        link.isMovingRight = false;
-        link.isMoving = false;
-        link.isAttacking = true;
-        break;
-    };
-  };
 };
 
 
@@ -882,10 +869,42 @@ var pickupCollisionDetection = function(x1, y1, x2, y2, object) {
 //Animation Game Loop
 var animationLoop = function() {
 
-  // game.frame();
+  game.setGameNow();
 
   ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
   ctxBackgroundMap.drawImage(background.image, background.xFrame, background.yFrame, background.pngWidth, background.pngHeight, 0, 0, background.mapWidth, background.mapHeight);
+
+  if (background.moveMapUp) {
+    if (background.mapCounter < 64) {
+      background.moveMapFrameUpStart();
+    } else {
+      background.moveMapFrameUpStop();
+    };
+  };
+
+  if (background.moveMapDown) {
+    if (background.mapCounter < 64) {
+      background.moveMapFrameDownStart();
+    } else {
+      background.moveMapFrameDownStop();
+    };
+  };
+
+  if (background.moveMapLeft) {
+    if (background.mapCounter < 64) {
+      background.moveMapFrameLeftStart();
+    } else {
+      background.moveMapFrameLeftStop();
+    };
+  };
+
+  if (background.moveMapRight) {
+    if (background.mapCounter < 64) {
+      background.moveMapFrameRightStart();
+    } else {
+      background.moveMapFrameRightStop();
+    };
+  };
 
   //Animates hearts
   if (heart.show) {
@@ -962,7 +981,7 @@ var animationLoop = function() {
 //Document ready function for DOM events
 document.addEventListener('DOMContentLoaded', function(event) {
   animationLoop();
-  window.addEventListener('keydown', playerAction);
-  window.addEventListener('keyup', link.moveStop);
+  window.addEventListener('keydown', link.playerAction);
+  window.addEventListener('keyup', link.actionStop);
 
 });
