@@ -99,6 +99,9 @@ var background = {
           baddy.life = baddy.maxLife;
         };
       });
+      if (link.life <= 3) {
+        heart.show = true;
+      };
     };
   },
 
@@ -120,6 +123,9 @@ var background = {
           baddy.life = baddy.maxLife;
         };
       });
+      if (link.life <= 3) {
+        heart.show = true;
+      };
     };
   },
 
@@ -141,6 +147,9 @@ var background = {
           baddy.life = baddy.maxLife;
         };
       });
+      if (link.life <= 3) {
+        heart.show = true;
+      };
     };
   },
 
@@ -162,6 +171,9 @@ var background = {
           baddy.life = baddy.maxLife;
         };
       });
+      if (link.life <= 3) {
+        heart.show = true;
+      };
     };
   }
 };
@@ -463,11 +475,11 @@ var dodongo = {
   yCenter: 20,  //y center of hit box
   moveAnimation: null,  //movement AI
   moveDirection: [this.xMove, this.yMove], //move directions
-  moveSpeed: 1, //number of px to move
+  moveSpeed: 0.75, //number of px to move
   numberOfSpaces: [1], //possible spaces moved
   life: 0,  //how much life
   maxLife: 3,  //how much starting life
-  dead: false,  //tracks if dead or not
+  dead: true,  //tracks if dead or not
   points: 3,  //how many points killing dodongo is worth
   levelShowUp: 5,  //first level seen
 
@@ -508,7 +520,8 @@ var link = {
   attackTime: null,  //tracks time link attacked
   hitTime: null,  //tracks time link was hit
   heartTime: null,  //tracks time when link picked up heart
-  life: 3,  //how much life left
+  life: 4,  //how much life left
+  maxLife: 4,  //max life
   moveUpAnimation: null,  //function for down movement
   moveDownAnimation: null,  //function for up movement
   moveLeftAnimation: null,  //function for left movement
@@ -531,12 +544,14 @@ var link = {
   },
 
   heartDisplay: function() {
-    if (link.life === 2) {
+    if (link.life === 3) {
       $('#heart-one').addClass('heart-hidden');
-    } else if (link.life === 1) {
+    } else if (link.life === 2) {
       $('#heart-two').addClass('heart-hidden');
-    } else if (link.life === 0) {
+    } else if (link.life === 1) {
       $('#heart-three').addClass('heart-hidden');
+    } else if (link.life === 0) {
+      $('#heart-four').addClass('heart-hidden');
       //link.die();
     }
   },
@@ -817,7 +832,7 @@ var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
       link.life -= 1;
       link.heartDisplay();
     };
-  } else if (link.isAttacking && ((game.now - link.attackTime) / 1000) > .25 && enemy.life > 0) {
+  } else if (link.isAttacking && ((game.now - link.attackTime) / 1000) > .2 && enemy.life > 0) {
     var xDistance = x2 - x1;
     var yDistance = y2 - y1;
     var hitRadius = Math.abs(Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2)));
@@ -834,8 +849,13 @@ var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
         enemy.dead = true;
       };
       if (enemy.dead) {
-        enemy.xMove = xStarting(enemy.spriteWidth);
-        enemy.yMove = yStarting(enemy.spriteHeight);
+        if (enemy !== dodongo) {
+          enemy.xMove = xStarting(enemy.spriteWidth);
+          enemy.yMove = yStarting(enemy.spriteHeight);
+        } else if (enemy === dodongo) {
+          enemy.xMove = -100;
+          enemy.yMove = yStarting(enemy.spriteHeight);
+        };
         game.score += enemy.points;
       };
     };
@@ -848,16 +868,21 @@ var pickupCollisionDetection = function(x1, y1, x2, y2, object) {
   var xDistance = x2 - x1;
   var yDistance = y2 - y1;
   var crashZone = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-  if (crashZone <= 30 && link.life <= 2) {
+  if (crashZone <= 30 && link.life <= 3) {
     object.show = false;
     object.x = xStarting(object.spriteWidth);
     object.y = yStarting(object.spriteHeight);
     if (link.life === 1 && ((game.now - link.heartTime) / 1000) > 1) {
       link.grabHeart();
       link.life += 1;
+      $('#heart-three').removeClass('heart-hidden');
+      $('#heart-three').addClass('heart-show');
+    } else if (link.life === 2 && ((game.now - link.heartTime) / 1000) > 1) {
+      link.grabHeart();
+      link.life += 1;
       $('#heart-two').removeClass('heart-hidden');
       $('#heart-two').addClass('heart-show');
-    } else if (link.life === 2 && ((game.now - link.heartTime) / 1000) > 1) {
+    } else if (link.life === 3 && ((game.now - link.heartTime) / 1000) > 1) {
       link.grabHeart();
       link.life += 1;
       $('#heart-one').removeClass('heart-hidden');
@@ -883,35 +908,35 @@ if (heart.show) {
   cancelAnimationFrame(heart.generateHeart);
 };
 
-if (!tektite.dead) {
+if (!tektite.dead && game.level >= tektite.levelShowUp) {
   ctxBackgroundMap.drawImage(tektite.image, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
   tektite.moveTektite();
 } else {
   cancelAnimationFrame(tektite.moveTektite);
 };
 
-if (!keese.dead && game.level >= 2) {
+if (!keese.dead && game.level >= keese.levelShowUp) {
   ctxBackgroundMap.drawImage(keese.image, keese.xFrame, keese.yFrame, keese.pngWidth, keese.pngHeight, keese.xMove, keese.yMove, keese.spriteWidth, keese.spriteHeight);
   keese.moveKeese();
 } else {
   cancelAnimationFrame(keese.moveKeese);
 };
 
-if (!gibdo.dead && game.level >= 3) {
+if (!gibdo.dead && game.level >= gibdo.levelShowUp) {
   ctxBackgroundMap.drawImage(gibdo.image, gibdo.xFrame, gibdo.yFrame, gibdo.pngWidth, gibdo.pngHeight, gibdo.xMove, gibdo.yMove, gibdo.spriteWidth, gibdo.spriteHeight);
   gibdo.moveGibdo();
 } else {
   cancelAnimationFrame(gibdo.moveGibdo);
 };
 
-if (!stalfos.dead && game.level >= 4) {
+if (!stalfos.dead && game.level >= stalfos.levelShowUp) {
   ctxBackgroundMap.drawImage(stalfos.image, stalfos.xFrame, stalfos.yFrame, stalfos.pngWidth, stalfos.pngHeight, stalfos.xMove, stalfos.yMove, stalfos.spriteWidth, stalfos.spriteHeight);
   stalfos.moveStalfos();
 } else {
   cancelAnimationFrame(stalfos.moveStalfos);
 };
 
-if (!dodongo.dead && game.level >= 0 && dodongo.xMove <= 600) {
+if (!dodongo.dead && game.level >= dodongo.levelShowUp && dodongo.xMove <= 600) {
   ctxBackgroundMap.drawImage(dodongo.image, dodongo.xFrame, dodongo.yFrame, dodongo.pngWidth, dodongo.pngHeight, dodongo.xMove, dodongo.yMove, dodongo.spriteWidth, dodongo.spriteHeight);
   dodongo.moveDodongo();
 } else {
