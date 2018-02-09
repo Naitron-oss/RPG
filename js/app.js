@@ -199,6 +199,11 @@ var background = {
 
 
 //Defining sprite and enemy map canvas'
+var explosionCanvas = document.getElementById('explosion-canvas');
+var ctxExplosionCanvas = explosionCanvas.getContext('2d');
+explosionCanvas.width = 512;
+explosionCanvas.height = 352;
+
 var enemyMap = document.getElementById('enemy-map');
 var ctxEnemyMap = enemyMap.getContext('2d');
 enemyMap.width = 512;
@@ -644,6 +649,7 @@ var link = {
     if (link.yMove <= link.upMapMove && game.score >= game.needToKill && background.yFrame > 0) {
       background.mapMoving = true;
       background.moveMapUp = true;
+      ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
     } else if (!background.mapMoving && link.yMove >= 0) {
       link.yMove -= link.moveSpeed;
       link.xFrame = 61;
@@ -661,21 +667,22 @@ var link = {
   },
 
   moveDown: function() {
-      if (link.yMove >= link.downMapMove && game.score >= game.needToKill && background.yFrame < 1232) {
-        background.mapMoving = true;
-        background.moveMapDown = true;
-      } else if (!background.mapMoving && link.yMove <= 317) {
-        link.yMove += link.moveSpeed;
-        link.xFrame = 0;
+    if (link.yMove >= link.downMapMove && game.score >= game.needToKill && background.yFrame < 1232) {
+      background.mapMoving = true;
+      background.moveMapDown = true;
+      ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
+    } else if (!background.mapMoving && link.yMove <= 317) {
+      link.yMove += link.moveSpeed;
+      link.xFrame = 0;
+      link.yFrame = 0;
+      if (link.downFrame < (link.frameSpeed / 2)) {
+        link.yFrame = 30;
+        link.downFrame++;
+      } else if(link.downFrame <= link.frameSpeed) {
         link.yFrame = 0;
-        if (link.downFrame < (link.frameSpeed / 2)) {
-          link.yFrame = 30;
-          link.downFrame++;
-        } else if(link.downFrame <= link.frameSpeed) {
-          link.yFrame = 0;
-          link.downFrame++;
-        } else {
-          link.downFrame = 0;
+        link.downFrame++;
+      } else {
+        link.downFrame = 0;
       };
     };
   },
@@ -684,6 +691,7 @@ var link = {
     if (link.xMove <= link.leftMapMove && game.score >= game.needToKill && background.xFrame > 0) {
       background.mapMoving = true;
       background.moveMapLeft = true;
+      ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
     } else if (!background.mapMoving && link.xMove >= 0) {
       link.xMove -= link.moveSpeed;
       link.xFrame = 29;
@@ -704,6 +712,7 @@ var link = {
     if (link.xMove >= link.rightMapMove && game.score >= game.needToKill && background.xFrame < 3840) {
       background.mapMoving = true;
       background.moveMapRight = true;
+      ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
     } else if (!background.mapMoving && link.xMove <= 479) {
       link.xMove += link.moveSpeed;
       link.xFrame = 90;
@@ -900,6 +909,7 @@ var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
         enemy.dead = true;
       };
       if (enemy.dead) {
+        ctxExplosionCanvas.drawImage(explosionPng, 40, 10, 280, 285, enemy.xMove, enemy.yMove, 60, 60);
         if (enemy.type !== 'runner') {
           enemy.xMove = xStarting(enemy.spriteWidth);
           enemy.yMove = yStarting(enemy.spriteHeight);

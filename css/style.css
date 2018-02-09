@@ -73,7 +73,7 @@ canvas {
   background: transparent;
   width: 100%;
   height: auto;
-  z-index: 5;
+  z-index: 50;
 }
 
 #death-canvas {
@@ -81,14 +81,21 @@ canvas {
   opacity: 0;
   width: 100%;
   height: auto;
-  z-index: 5;
+  z-index: 70;
+}
+
+#explosion-canvas {
+  background: transparent;
+  width: 100%;
+  height: auto;
+  z-index: 30;
 }
 
 #sprite-map {
   background: transparent;
   width: 100%;
   height: auto;
-  z-index: 10;
+  z-index: 100;
 }
 
 .hearts-col {
