@@ -289,6 +289,18 @@ stalfosPng.src = 'images/stalfos.png';
 var dodongoPng = new Image();
 dodongoPng.src = 'images/dodongo.png';
 
+var armosPng = new Image();
+armosPng.src = 'images/armos.png';
+
+var wizzrobePng = new Image();
+wizzrobePng.src = 'images/wizzrobe.png';
+
+var darknutPng = new Image();
+darknutPng.src = 'images/darknut.png';
+
+var aquamentusPng = new Image();
+aquamentusPng.src = 'images/aquamentus.png';
+
 var moblinPng = new Image();
 moblinPng.src = 'images/moblin.png';
 
@@ -539,8 +551,8 @@ var dodongo = {
   pngHeight: 16,  //height of src img sprite size
   spriteWidth: 90,  //width of sprite on canvas
   spriteHeight: 45,  //height of sprite on canvas
-  xMove:   -100,  //x point of dodongo on canvas
-  yMove:   yStarting(50),  //y point of dodongo on canvas
+  xMove: -100,  //x point of dodongo on canvas
+  yMove: yStarting(50),  //y point of dodongo on canvas
   xCenter: 18.75,  //x center of hit box
   yCenter: 20,  //y center of hit box
   moveAnimation: null,  //movement AI
@@ -568,12 +580,118 @@ var armos = {};
 
 //scared wizard creature, runs away from link
 //leve 7+
-var wizzrobe = {};
+var wizzrobe = {
+  image: wizzrobePng,
+  xFrame: 0,  //x starting point of src img for sprite frame
+  yFrame: 0,  //y starting point of src img for sprite frame
+  pngWidth: 15,  //width of src img sprite size
+  pngHeight: 16,  //height of src img sprite size
+  spriteWidth: 40.3125,  //width of sprite on canvas
+  spriteHeight: 43,  //height of sprite on canvas
+  xMove:   xStarting(45),  //x point of wizzrobe on canvas
+  yMove:   yStarting(45),  //y point of wizzrobe on canvas
+  xCenter: 23,  //x center of hit box
+  yCenter: 23,  //y center of hit box
+  moveAnimation: null,  //movement AI
+  moveDirection: [this.xMove, this.yMove], //move directions
+  moveSpeed: 1, //number of px to move
+  numberOfSpaces: [1], //possible spaces moved
+  type: 'scared',  //what type of enemy
+  life: 0,  //how much life
+  maxLife: 2,  //how much starting life
+  strength: 1,  //how much life taken per hit to link
+  dead: true,  //tracks if dead or not
+  points: 1,  //how many points killing wizzrobe is worth
+  levelShowUp: 7,  //first level seen
+
+  moveWizzrobe: function() {
+    //move diagonally bottom right
+    if (this.xMove - link.xMove >= 0 && this.yMove - link.yMove >= 0) {
+      if (this.xMove < 445 && this.yMove < 285) {
+        this.xMove += this.moveSpeed;
+        this.yMove += this.moveSpeed;
+      } else if (this.xMove >= 445 && this.yMove < 285) {
+        this.yMove += this.moveSpeed;
+      } else if (this.xMove < 445 && this.yMove >= 285) {
+        this.xMove += this.moveSpeed;
+      } else if (this.xMove >= 445 && this.yMove >= 285) {
+        this.xMove = 230;
+        this.yMove = 140;
+      };
+      //move diagonally top right
+    } else if (this.xMove - link.xMove >= 0 && this.yMove - link.yMove <= 0) {
+      if (this.xMove < 445 && this.yMove > 0) {
+        this.xMove += this.moveSpeed;
+        this.yMove -= this.moveSpeed;
+      } else if (this.xMove >= 445 && this.yMove > 0) {
+        this.yMove -= this.moveSpeed;
+      } else if (this.xMove < 445 && this.yMove <= 0) {
+        this.xMove += this.moveSpeed;
+      } else if (this.xMove >= 445 && this.yMove <= 0) {
+        this.xMove = 230;
+        this.yMove = 140;
+      };
+      //move diagonally top left
+    } else if (this.xMove - link.xMove <= 0 && this.yMove - link.yMove <= 0) {
+      if (this.xMove > 0 && this.yMove > 0) {
+        this.xMove -= this.moveSpeed;
+        this.yMove -= this.moveSpeed;
+      } else if (this.xMove <= 0 && this.yMove > 0) {
+        this.yMove -= this.moveSpeed;
+      } else if (this.xMove > 0 && this.yMove <= 0) {
+        this.xMove -= this.moveSpeed;
+      } else if (this.xMove <= 0 && this.yMove <= 0) {
+        this.xMove = 230;
+        this.yMove = 140;
+      };
+      //move diagonally bottom left
+    } else if (this.xMove - link.xMove <= 0 && this.yMove - link.yMove >= 0) {
+      if (this.xMove > 0 && this.yMove < 285) {
+        this.xMove -= this.moveSpeed;
+        this.yMove += this.moveSpeed;
+      } else if (this.xMove <= 0 && this.yMove < 285) {
+        this.yMove += this.moveSpeed;
+      } else if (this.xMove > 0 && this.yMove >= 285) {
+        this.xMove -= this.moveSpeed;
+      } else if (this.xMove <= 0 && this.yMove >= 285) {
+        this.xMove = 230;
+        this.yMove = 140;
+      }
+    };
+  }
+};
 
 
 //knight creature rushes down screen like dodongo but faster or randomly after enemy dies
 // level 8+
-var darknut = {};
+var darknut = {
+  image: darknutPng,
+  xFrame: 0,  //x starting point of src img for sprite frame
+  yFrame: 0,  //y starting point of src img for sprite frame
+  pngWidth: 16,  //width of src img sprite size
+  pngHeight: 16,  //height of src img sprite size
+  spriteWidth: 45,  //width of sprite on canvas
+  spriteHeight: 45,  //height of sprite on canvas
+  xMove: -100,  //x point of darknut on canvas
+  yMove: yStarting(50),  //y point of darknut on canvas
+  xCenter: 18.75,  //x center of hit box
+  yCenter: 20,  //y center of hit box
+  moveAnimation: null,  //movement AI
+  moveDirection: [this.xMove, this.yMove], //move directions
+  moveSpeed: 0.9, //number of px to move
+  numberOfSpaces: [1], //possible spaces moved
+  type: 'runner',  //what type of enemy
+  life: 0,  //how much life
+  maxLife: 3,  //how much starting life
+  strength: 2.5,  //how much life taken per hit to link
+  dead: true,  //tracks if dead or not
+  points: 2,  //how many points killing darknut is worth
+  levelShowUp: 5,  //first level seen
+
+  moveDarknut: function() {
+    this.xMove += this.moveSpeed;
+  }
+};
 
 
 //loch ness monster creature, rush across screen R to L, goes towards link if hes near
@@ -581,7 +699,7 @@ var darknut = {};
 var aquamentus = {};
 
 
-//boss - goblin type creature, rushes edges?
+//boss - goblin type creature, 3 stages 1) circle, 2) runner, 3) scared
 //worth 5 points
 //level 10
 var moblin = {
@@ -608,7 +726,7 @@ var moblin = {
   strength: 1,  //how much life taken per hit to link
   dead: true,  //tracks if dead or not
   points: 1,  //how many points killing moblin is worth
-  levelShowUp: 2,  //first level seen
+  levelShowUp: 10,  //first level seen
 
   moveMoblin: function() {
     if (this.life > 4) {  //Stage One
@@ -1329,7 +1447,7 @@ var animationLoop = function() {
     game.over = true;
   };
 
-  if (!game.continous && game.level >= 2 && moblin.life <= 0) {
+  if (!game.continous && game.level >= 10 && moblin.life <= 0) {
     game.win = true;
   };
 
@@ -1417,7 +1535,21 @@ var animationLoop = function() {
       resetOffscreenEnemies(dodongo);
     };
 
-    //Animates moblin
+    //Animates armos
+
+
+    //Animates wizzrobe
+    if (!wizzrobe.dead && game.level >= wizzrobe.levelShowUp) {
+      ctxEnemyMap.drawImage(wizzrobe.image, wizzrobe.xFrame, wizzrobe.yFrame, wizzrobe.pngWidth, wizzrobe.pngHeight, wizzrobe.xMove, wizzrobe.yMove, wizzrobe.spriteWidth, wizzrobe.spriteHeight);
+      wizzrobe.moveWizzrobe();
+    };
+
+    //Animates darknut
+
+
+    //Animates aquamentus
+
+
     //Animates moblin
     if (!moblin.dead && game.level >= moblin.levelShowUp) {
       ctxEnemyMap.drawImage(moblin.image, moblin.xFrame, moblin.yFrame, moblin.pngWidth, moblin.pngHeight, moblin.xMove, moblin.yMove, moblin.spriteWidth, moblin.spriteHeight);
@@ -1454,6 +1586,14 @@ var animationLoop = function() {
     enemyCollisionDetection(link.xMove, link.yMove, stalfos.xMove, stalfos.yMove, stalfos);
     //dodongo
     enemyCollisionDetection(link.xMove, link.yMove, dodongo.xMove, dodongo.yMove, dodongo);
+    //armos
+
+    //wizzrobe
+    enemyCollisionDetection(link.xMove, link.yMove, wizzrobe.xMove, wizzrobe.yMove, wizzrobe);
+    //darknut
+
+    //aquamentus
+
     //moblin
     enemyCollisionDetection(link.xMove, link.yMove, moblin.xMove, moblin.yMove, moblin);
 
