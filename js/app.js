@@ -1,7 +1,9 @@
 
 //Game info and functions
 var game = {
+  win: false,  //tracks if won game
   over: true,  //tracks game over or not
+  continuous: false,  //tracks continous or boss mode
   score: 0,  //tracks current kill score
   level: 1,  //which level player is on
   needToKill: 1,  //tracks how many enemies link needs to kill to progress
@@ -73,6 +75,8 @@ var backgroundMap = document.getElementById('background-map');
 var ctxBackgroundMap = backgroundMap.getContext('2d');
 var backgroundImage = new Image();
 backgroundImage.src = 'images/overworld_map.png';
+var backgroundWinImage = new Image();
+backgroundWinImage.src = 'images/castle.png';
 backgroundMap.width = 512;
 backgroundMap.height = 352;
 
@@ -88,6 +92,7 @@ var yMapStart = function(spriteHeight) {
 
 var background = {
   image: backgroundImage,
+  winImage: backgroundWinImage,
   xFrame: xMapStart(),  //x axis start of current map frame (from src img)
   yFrame: yMapStart(),  //y axis start of current map frame (from src img)
   moveSpeed: 4,  //speed at which map moves frames
@@ -222,9 +227,10 @@ var ctxSpriteMap = spriteMap.getContext('2d');
 spriteMap.width = 512;
 spriteMap.height = 352;
 
-
-
-var startGameButton = $('#start-game');
+var winCanvas = document.getElementById('win-canvas');
+var ctxWinCanvas = winCanvas.getContext('2d');
+winCanvas.width = 512;
+winCanvas.height = 352;
 
 
 //Random Number Generators
@@ -259,11 +265,14 @@ var yStarting = function(spriteHeight) {
 var explosionPng = new Image();
 explosionPng.src = 'images/explosion-death.png';
 
-var explosionGif = new Image();
-explosionGif.src = 'images/explosion-gif.gif';
+var bossExplosionPng = new Image();
+bossExplosionPng.src = 'images/boss-explosion.png';
 
 var linkPng = new Image();
 linkPng.src = 'images/link-spritesheet.png';
+
+var zeldaPng = new Image();
+zeldaPng.src = 'images/zelda.png';
 
 var tektitePng = new Image();
 tektitePng.src = 'images/tektite.png';
@@ -672,9 +681,9 @@ var moblin = {
           this.cycleTwo++;
         };
       } else if (this.cycleTwo === 13) {  //Bottom to Top
-        if (this.yMove > 0) {
+        if (this.yMove > -80) {
           this.yMove -= this.moveSpeed;
-        } else if (this.yMove <= 0) {
+        } else if (this.yMove <= -80) {
           this.xMove = 590;
           this.yMove = 240;
           this.cycleTwo++;
@@ -741,12 +750,11 @@ var moblin = {
         } else if (this.xMove <= 0 && this.yMove >= 285) {
           this.xMove = 230;
           this.yMove = 140;
-      }
+        }
+      };
+    } else if (this.life <= 0 && !game.continous) {
+      game.win
     };
-  };
-    //    else if () {  //Win game
-    //
-    // }
   }
 };
 
@@ -959,35 +967,35 @@ var link = {
   //Player move Function
   playerAction: function(event) {
     //Up
-    if (event.keyCode === 38 && !game.over) {
+    if (event.keyCode === 38 && !game.over && !game.win) {
       if (!link.isMovingUp && !link.isMoving && !link.isAttacking && link.yMove >= 1) {
           link.isMovingUp = true;
           link.isMoving = true;
         };
     }
     //Down
-    if (event.keyCode === 40 && !game.over) {
+    if (event.keyCode === 40 && !game.over && !game.win) {
       if (!link.isMovingDown && !link.isMoving && !link.isAttacking && link.yMove <= 317) {
           link.isMovingDown = true;
           link.isMoving = true;
         };
     }
     //Left
-    if (event.keyCode === 37 && !game.over) {
+    if (event.keyCode === 37 && !game.over && !game.win) {
       if (!link.isMovingLeft && !link.isMoving && !link.isAttacking && link.xMove >= 0) {
           link.isMovingLeft = true;
           link.isMoving = true;
         };
     }
     //Right
-    if (event.keyCode === 39 && !game.over) {
+    if (event.keyCode === 39 && !game.over && !game.win) {
       if (!link.isMovingRight && !link.isMoving && !link.isAttacking && link.xMove <= 479) {
           link.isMovingRight = true;
           link.isMoving = true;
         };
     }
     //Spacebar
-    if (event.keyCode === 32 && !game.over) {
+    if (event.keyCode === 32 && !game.over && !game.win) {
       switch(true) {
         //if facing up
         case link.xFrame === 61:
@@ -1039,31 +1047,31 @@ var link = {
 
   actionStop: function(event) {
     //Stop moving up
-    if(event.keyCode === 38 && !game.over) {
+    if(event.keyCode === 38 && !game.over && !game.win) {
       link.isMovingUp = false;
       link.isMoving = false;
       link.yFrame = 30;
     };
     //Stop moving down
-    if(event.keyCode === 40 && !game.over) {
+    if(event.keyCode === 40 && !game.over && !game.win) {
       link.isMovingDown = false;
       link.isMoving = false;
       link.yFrame = 0;
     };
     //Stop moving left
-    if(event.keyCode === 37 && !game.over) {
+    if(event.keyCode === 37 && !game.over && !game.win) {
       link.isMovingLeft = false;
       link.isMoving = false;
       link.yFrame = 0;
     };
     //Stop moving right
-    if(event.keyCode === 39 && !game.over) {
+    if(event.keyCode === 39 && !game.over && !game.win) {
       link.isMovingRight = false;
       link.isMoving = false;
       link.yFrame = 31;
     };
     //Stop attacking
-    if (event.keyCode === 32 && !game.over) {
+    if (event.keyCode === 32 && !game.over && !game.win) {
       switch(true) {
         //if facing up
         case link.xFrame === 60:
@@ -1139,13 +1147,19 @@ var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
       console.log('hit');
       if (enemy.life === 0) {
         enemy.dead = true;
-        var enemyExplosion = new Audio('enemy-explosion.mp3');
-        if (game.soundFx) {
+        if (game.soundFx && enemy.type !== 'boss') {
+          var enemyExplosion = new Audio('enemy-explosion.mp3');
           enemyExplosion.play();
+        } else if (enemy.type === 'boss') {
+          var horn = new Audio('horn.mp3');
+          horn.play();
         };
       };
       if (enemy.dead) {
         ctxExplosionCanvas.drawImage(explosionPng, 40, 10, 280, 285, enemy.xMove, enemy.yMove, 60, 60);
+        if (enemy.type === 'boss') {
+          ctxExplosionCanvas.drawImage(bossExplosionPng, 0, 0, 958, 952, moblin.xMove, moblin.yMove, 80, 80);
+        };
         if (enemy.type !== 'runner') {
           enemy.xMove = xStarting(enemy.spriteWidth);
           enemy.yMove = yStarting(enemy.spriteHeight);
@@ -1217,6 +1231,9 @@ var pickupCollisionDetection = function(x1, y1, x2, y2, object) {
 };
 
 
+var startGameButton = $('#start-game');
+
+
 //Game over functions
   //link death spin
 var linkDies = function() {
@@ -1274,6 +1291,35 @@ var gameOver = function() {
 };
 
 
+//win game function
+var winGame = function () {
+  cancelAnimationFrame(animateGame);
+  ctxBackgroundMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+  ctxEnemyMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+  ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
+  ctxSpriteMap.clearRect(0, 0, spriteMap.width, spriteMap.height);
+
+  ctxBackgroundMap.drawImage(background.winImage, 0, 0, 1920, 1080, 0, 0, background.mapWidth, background.mapHeight);
+  ctxSpriteMap.drawImage(link.image, 90, 30, link.pngWidth, link.pngHeight, 165, 200, 71.25, 76);
+  ctxSpriteMap.drawImage(zeldaPng, 0, 0, 14, 16, 295, 200, 66.5, 76);
+
+  ctxSpriteMap.font = "20px 'Press Start 2P'";
+  ctxSpriteMap.fillStyle = 'black';
+  ctxSpriteMap.fillText('Oh, you won?', 20, 40);
+
+  ctxSpriteMap.font = "20px 'Press Start 2P'";
+  ctxSpriteMap.fillStyle = 'black';
+  ctxSpriteMap.fillText('That\'s neat I guess.', 20, 70);
+
+  ctxSpriteMap.font = "20px 'Press Start 2P'";
+  ctxSpriteMap.fillStyle = 'black';
+  ctxSpriteMap.fillText('Want a sandwich?', 20, 320);
+
+  startGameButton.html('Replay game');
+  startGameButton.css('visibility', 'visible');
+};
+
+
 //Animation Game Loop
 var animateGame = null;
 
@@ -1283,9 +1329,14 @@ var animationLoop = function() {
     game.over = true;
   };
 
-  if (!game.over) {
+  if (!game.continous && game.level >= 2 && moblin.life <= 0) {
+    game.win = true;
+  };
+
+  if (!game.over && !game.win) {
     game.setGameNow();
     game.soundFx = $('#soundFx').prop('checked');
+    game.continue = $('#continuous-play').prop('checked');
 
 
     ctxEnemyMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
@@ -1413,16 +1464,14 @@ var animationLoop = function() {
     $('#kills-num').html(game.needToKill);
     //$('#high-score').html()
 
-
-    //checks for win
-
-
-
     animateGame = requestAnimationFrame(animationLoop);
 
   } else if (game.over) {
     game.endTime = Date.now();
     gameOver();
+  } else if (game.win) {
+    ctxEnemyMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
+    setTimeout(winGame, 1500);
   };
 
 };
@@ -1430,7 +1479,7 @@ var animationLoop = function() {
 
 //replay and restart game
 var startGame = function() {
-  if (game.over) {
+  if (game.over || game.win) {
     allEnemies.forEach(function(baddy) {
       baddy.dead = true;
       baddy.life = 0;
@@ -1446,6 +1495,9 @@ var startGame = function() {
     link.heartDisplay();
     link.xMove = xStarting(32);
     link.yMove = yStarting(35);
+    link.xFrame = 0;
+    link.yFrame = 0;
+    game.win = false;
     game.over = false;
     game.level = 1;
     game.setNeedToKill();
@@ -1453,7 +1505,9 @@ var startGame = function() {
     background.xFrame = xMapStart();
     background.yFrame = yMapStart();
     deathCanvas.style.opacity = '0';
+    ctxBackgroundMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
     ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
+    ctxSpriteMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
     backgroundMap.classList.remove('canvas-blur');
     enemyMap.classList.remove('canvas-blur');
     cancelAnimationFrame(titleScreen);

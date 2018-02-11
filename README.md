@@ -98,15 +98,18 @@ Add title screen
 
 Step 21:
 Add boss
+//add special sound effects
 
 Step 22:
 Add win screen
+-~-COMPLETE
+
+Step 23:
+Continuous mode or win mode with boss
+-~-COMPLETE
 
 Step ??:
 Add ___ bad guys????
-
-Step ??:
-How do you win????
 
 Step ??:
 Add a place to enter players name
