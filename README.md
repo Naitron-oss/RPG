@@ -72,6 +72,36 @@ Add keese, gibdo, stalfos
 //give each their own AI so they are their own character
 -~-COMPLETE
 
+Step 15:
+Add game over screen
+-~-COMPLETE
+
+Step 16:
+Add link and enemy death animations
+-~-COMPLETE
+
+Step 17:
+Complete layout of page
+-~-COMPLETE
+
+Step 18:
+Add backing track and sound effects
+-~-COMPLETE
+
+Step 19:
+Add game over screen
+-~-COMPLETE
+
+Step 20:
+Add title screen
+-~-COMPLETE
+
+Step 21:
+Add boss
+
+Step 22:
+Add win screen
+
 Step ??:
 Add ___ bad guys????
 
@@ -79,26 +109,12 @@ Step ??:
 How do you win????
 
 Step ??:
-Add link and enemy death animations
-
-Step ??:
-Complete layout of page
-
-Step ??:
-Add title screen
-
-Step ??:
-Add game over screen
-
-Step ??:
 Add a place to enter players name
 
 Step ??:
 Add local storage to store players name and high score
 
-
-
-
+==========
 
 Step ??:
 Make map key where Link and enemies can/can't be on

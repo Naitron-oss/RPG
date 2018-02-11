@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Top Down RPG Game</title>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div id="topspace" class="col-12 topspace">
+          <p class="title">Legend of tiny pixelated 1980s man!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row game-row">
+        <div id="left-side" class="col-2 left-side" height="352">
+          <div class="left-border-box">
+            <p>Player Name: </p>
+            <p id="player-name">Scott</p>
+          </div>
+          <div class="left-border-box">
+            <p>Game level:</p>
+            <p id="game-num">0</p>
+          </div>
+          <div class="left-border-box">
+            <p>Kills to advance:</p>
+            <p id="kills-num">0</p>
+          </div>
+          <div class="left-border-box">
+            <p>Kill score:</p>
+            <p id="score-num">0</p>
+          </div>
+          <div>
+            <p>High score:</p>
+            <p id="high-score">0</p>
+          </div>
+        </div>
+        <div class="col-8 canvas-div" width="512" height="352">
+          <canvas id="background-map" class="canvas-blur"></canvas>
+          <canvas id="enemy-map" class="canvas-blur"></canvas>
+          <canvas id="death-canvas"></canvas>
+          <canvas id="explosion-canvas"></canvas>
+          <canvas id="sprite-map"></canvas>
+        </div>
+        <div class="col-2 hearts-col" height="352">
+          <img class="heart" id="heart-one" src="images/heart.gif"><br>
+          <img class="heart" id="heart-two" src="images/heart.gif"><br>
+          <img class="heart" id="heart-three" src="images/heart.gif"><br>
+          <img class="heart" id="heart-four" src="images/heart.gif"><br>
+          <label>Invincible
+            <input class="checkboxes" type="checkbox" id="invincible"><br>
+          </label>
+          <label>Sound effects
+            <input class="checkboxes" type="checkbox" id="soundFx"><br>
+          </label>
+          <button type="button" class="grow-button" id="start-game">Start game</button>
+          <button type="button" id="continue">Continue</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="audio-box">
+      <audio controls autoplay loop>
+        <source src="background-song.wav" type="audio/wav">
+      </audio>
+    </div>
+
+    <div id="about-box">
+      <div id="made-by-box">
+        <p> game and music by scott rosehart</p>
+      </div>
+      <div id="links-box">
+        <p>filler | filler | filler | filler</p>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+  </body>
+</html>
