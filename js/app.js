@@ -130,6 +130,9 @@ var background = {
     if (link.life <= 3) {
       heart.show = true;
     };
+    if (link.life <= 1 || game.level === 10) {
+      bigHeart.show = true;
+    };
   },
 
   moveMapFrameDownStart: function() {
@@ -153,6 +156,9 @@ var background = {
     });
     if (link.life <= 3) {
       heart.show = true;
+    };
+    if (link.life <= 1 || game.level === 10) {
+      bigHeart.show = true;
     };
   },
 
@@ -178,6 +184,9 @@ var background = {
     if (link.life <= 3) {
       heart.show = true;
     };
+    if (link.life <= 1 || game.level === 10) {
+      bigHeart.show = true;
+    };
   },
 
   moveMapFrameRightStart: function() {
@@ -201,6 +210,9 @@ var background = {
     });
     if (link.life <= 3) {
       heart.show = true;
+    };
+    if (link.life <= 1 || game.level === 10) {
+      bigHeart.show = true;
     };
   }
 };
@@ -307,6 +319,9 @@ moblinPng.src = 'images/moblin.png';
 var heartPng = new Image();
 heartPng.src = 'images/heart.gif';
 
+var bigHeartPng = new Image();
+bigHeartPng.src = 'images/big-heart.png';
+
 
 //Define hearts
 var heart = {
@@ -323,8 +338,22 @@ var heart = {
   heartAnimation: null
 };
 
+var bigHeart = {
+  image: bigHeartPng,
+  xFrame: 0,  //x starting point of src img for sprite frame
+  yFrame: 0,  //y starting point of src img for sprite frame
+  pngWidth: 13,  //width of src img sprite size
+  pngHeight: 13,  //height of src img sprite size
+  spriteWidth: 30,  //width of sprite on canvas
+  spriteHeight: 30,  //height of sprite on canvas
+  x: xStarting(80),  //x value where to display heart
+  y: yStarting(80),  //y value where to display heart
+  show: false,
+  heartAnimation: null
+};
 
-//Define characters
+
+//Define enemies
 
 //spider creature, jumps up to 3 spaces, slowly and randomly
 //worth 1 point || strength 0.5 || max life 1
@@ -465,7 +494,7 @@ var gibdo = {
   yCenter: 20,  //y center of hit box
   moveAnimation: null,  //movement AI
   moveDirection: [this.xMove, this.yMove], //move directions
-  moveSpeed: 1.35, //number of px to move
+  moveSpeed: 1.75, //number of px to move
   numberOfSpaces: [0, 1], //possible spaces moved
   type: 'smart',  //what type of enemy
   life: 0,  //how much life
@@ -476,7 +505,7 @@ var gibdo = {
   levelShowUp: 3,  //first level seen
 
   moveGibdo: function() {
-    //Moves if coinFlip is 1
+    //Moves on coinFlip
     if (coinFlip(2) === 0) {
       if (this.xMove - link.xMove >= 0) {
         this.xMove -= this.moveSpeed * this.numberOfSpaces[coinFlip(2)];
@@ -511,7 +540,7 @@ var stalfos = {
   yCenter: 20,  //y center of hit box
   moveAnimation: null,  //movement AI
   moveDirection: [this.xMove, this.yMove], //move directions
-  moveSpeed: 1.75, //number of px to move
+  moveSpeed: 2, //number of px to move
   numberOfSpaces: [1], //possible spaces moved
   type: 'smart',  //what type of enemy
   life: 0,  //how much life
@@ -770,7 +799,7 @@ var aquamentus = {
   strength: 2,  //how much life taken per hit to link
   dead: true,  //tracks if dead or not
   points: 3,  //how many points killing aquamentus is worth
-  levelShowUp: 2,  //first level seen
+  levelShowUp: 9,  //first level seen
 
   moveAquamentus: function() {
     //charges link if close, otherwise charges left
@@ -1001,7 +1030,10 @@ var yResetOffscreenEnemies = function (enemy) {
 //All enemies array
 var allEnemies = [tektite, keese, gibdo, stalfos, dodongo, armos, wizzrobe, darknut, aquamentus, moblin];
 
+var liveEnemies = [];
+var areEnemiesDead = null;
 
+//Define player
 //Player, aka Link
 var link = {
   image: linkPng,  //src image
@@ -1112,7 +1144,7 @@ var link = {
   },
 
   moveUp: function() {
-    if (link.yMove <= link.upMapMove && game.score >= game.needToKill && background.yFrame > 0) {
+    if (link.yMove <= link.upMapMove && game.score >= game.needToKill && background.yFrame > 0 && areEnemiesDead()) {
       background.mapMoving = true;
       background.moveMapUp = true;
       ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
@@ -1133,7 +1165,7 @@ var link = {
   },
 
   moveDown: function() {
-    if (link.yMove >= link.downMapMove && game.score >= game.needToKill && background.yFrame < 1232) {
+    if (link.yMove >= link.downMapMove && game.score >= game.needToKill && background.yFrame < 1232 && areEnemiesDead()) {
       background.mapMoving = true;
       background.moveMapDown = true;
       ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
@@ -1154,7 +1186,7 @@ var link = {
   },
 
   moveLeft: function() {
-    if (link.xMove <= link.leftMapMove && game.score >= game.needToKill && background.xFrame > 0) {
+    if (link.xMove <= link.leftMapMove && game.score >= game.needToKill && background.xFrame > 0 && areEnemiesDead()) {
       background.mapMoving = true;
       background.moveMapLeft = true;
       ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
@@ -1175,7 +1207,7 @@ var link = {
   },
 
   moveRight: function() {
-    if (link.xMove >= link.rightMapMove && game.score >= game.needToKill && background.xFrame < 3840) {
+    if (link.xMove >= link.rightMapMove && game.score >= game.needToKill && background.xFrame < 3840 && areEnemiesDead()) {
       background.mapMoving = true;
       background.moveMapRight = true;
       ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
@@ -1349,7 +1381,7 @@ var link = {
 
 //Collision Detection between Link and enemies
 var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
-  if (!link.isAttacking && ((game.now - link.hitTime) / 1000) > 1.1 && enemy.life > 0) {
+  if (!link.isAttacking && ((game.now - link.hitTime) / 1000) > 1.25 && enemy.life > 0) {
     var xDistance = x2 - x1;
     var yDistance = y2 - (y1 - 4);
     var hitRadius = Math.abs(Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2)));
@@ -1413,54 +1445,81 @@ var heartCollisionDetection = function(x1, y1, x2, y2, object) {
   var xDistance = x2 - x1;
   var yDistance = y2 - y1;
   var crashZone = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-  if (crashZone <= 30 && link.life <= 3 && object.show === true) {
+  if (crashZone <= 30 && link.life <= 3.5 && object.show === true) {
     object.show = false;
     var heartGain = new Audio('heart-gain.mp3');
-    if (game.soundFx) {
-      heartGain.play();
-    };
-    object.x = xStarting(object.spriteWidth);
-    object.y = yStarting(object.spriteHeight);
-    if (link.life === 0.5 && ((game.now - link.heartTime) / 1000) > 1) {
-      link.grabHeart();
-      link.life += 1;
-      $('#heart-four').removeClass('damaged');
-      $('#heart-three').removeClass('heart-hidden');
-      $('#heart-three').addClass('heart-show');
-    } else if (link.life === 1 && ((game.now - link.heartTime) / 1000) > 1) {
-      link.grabHeart();
-      link.life += 1;
-      $('#heart-three').removeClass('heart-hidden');
-      $('#heart-three').removeClass('damaged');
-      $('#heart-three').addClass('heart-show');
-    } else if (link.life === 1.5 && ((game.now - link.heartTime) / 1000) > 1) {
-      link.grabHeart();
-      link.life += 1;
-      $('#heart-three').removeClass('damaged');
-      $('#heart-two').removeClass('heart-hidden');
-      $('#heart-two').addClass('heart-show');
-    } else if (link.life === 2 && ((game.now - link.heartTime) / 1000) > 1) {
-      link.grabHeart();
-      link.life += 1;
-      $('#heart-two').removeClass('heart-hidden');
-      $('#heart-two').removeClass('damaged');
-      $('#heart-two').addClass('heart-show');
-    } else if (link.life === 2.5 && ((game.now - link.heartTime) / 1000) > 1) {
-      link.grabHeart();
-      link.life += 1;
-      $('#heart-two').removeClass('damaged');
-      $('#heart-one').removeClass('heart-hidden');
-      $('#heart-one').addClass('heart-show');
-    } else if (link.life === 3 && ((game.now - link.heartTime) / 1000) > 1) {
-      link.grabHeart();
-      link.life += 1;
-      $('#heart-one').removeClass('heart-hidden');
-      $('#heart-one').removeClass('damaged');
-      $('#heart-one').addClass('heart-show');
-    } else if (link.life === 3.5 && ((game.now - link.heartTime) / 1000) > 1) {
-      link.grabHeart();
-      link.life += 0.5;
-      $('#heart-one').removeClass('damaged');
+    var bigHeartGain = new Audio('big-heart-gain.wav');
+    if (object === bigHeart) {
+      if (game.soundFx) {
+        bigHeartGain.play();
+      };
+      object.x = xStarting(object.spriteWidth);
+      object.y = yStarting(object.spriteHeight);
+      if (link.life <= 3.5 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life = link.maxLife;
+        $('#heart-one').removeClass('damaged');
+        $('#heart-one').removeClass('heart-hidden');
+        $('#heart-one').addClass('heart-show');
+        $('#heart-two').removeClass('damaged');
+        $('#heart-two').removeClass('heart-hidden');
+        $('#heart-two').addClass('heart-show');
+        $('#heart-three').removeClass('damaged');
+        $('#heart-three').removeClass('heart-hidden');
+        $('#heart-three').addClass('heart-show');
+        $('#heart-four').removeClass('damaged');
+      } else if (link.life === 3.5 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life = link.maxLife;
+        $('#heart-four').removeClass('damaged');
+      };
+    } else if (object === heart) {
+      if (game.soundFx) {
+        heartGain.play();
+      };
+      object.x = xStarting(object.spriteWidth);
+      object.y = yStarting(object.spriteHeight);
+      if (link.life === 0.5 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life += 1;
+        $('#heart-four').removeClass('damaged');
+        $('#heart-three').removeClass('heart-hidden');
+        $('#heart-three').addClass('heart-show');
+      } else if (link.life === 1 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life += 1;
+        $('#heart-three').removeClass('heart-hidden');
+        $('#heart-three').removeClass('damaged');
+        $('#heart-three').addClass('heart-show');
+      } else if (link.life === 1.5 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life += 1;
+        $('#heart-three').removeClass('damaged');
+        $('#heart-two').removeClass('heart-hidden');
+        $('#heart-two').addClass('heart-show');
+      } else if (link.life === 2 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life += 1;
+        $('#heart-two').removeClass('heart-hidden');
+        $('#heart-two').removeClass('damaged');
+        $('#heart-two').addClass('heart-show');
+      } else if (link.life === 2.5 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life += 1;
+        $('#heart-two').removeClass('damaged');
+        $('#heart-one').removeClass('heart-hidden');
+        $('#heart-one').addClass('heart-show');
+      } else if (link.life === 3 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life += 1;
+        $('#heart-one').removeClass('heart-hidden');
+        $('#heart-one').removeClass('damaged');
+        $('#heart-one').addClass('heart-show');
+      } else if (link.life === 3.5 && ((game.now - link.heartTime) / 1000) > 1) {
+        link.grabHeart();
+        link.life += 0.5;
+        $('#heart-one').removeClass('damaged');
+      };
     };
   };
 };
@@ -1618,6 +1677,10 @@ var animationLoop = function() {
     if (heart.show) {
       ctxEnemyMap.drawImage(heart.image, heart.xFrame, heart.yFrame, heart.pngWidth, heart.pngHeight, heart.x, heart.y, heart.spriteWidth, heart.spriteHeight);
     };
+    //Animates big hearts
+    if (bigHeart.show) {
+      ctxEnemyMap.drawImage(bigHeart.image, bigHeart.xFrame, bigHeart.yFrame, bigHeart.pngWidth, bigHeart.pngHeight, bigHeart.x, bigHeart.y, bigHeart.spriteWidth, bigHeart.spriteHeight);
+    };
     //Animates tektites
     if (!tektite.dead && game.level >= tektite.levelShowUp) {
       ctxEnemyMap.drawImage(tektite.image, tektite.xFrame, tektite.yFrame, tektite.pngWidth, tektite.pngHeight, tektite.xMove, tektite.yMove, tektite.spriteWidth, tektite.spriteHeight);
@@ -1710,6 +1773,8 @@ var animationLoop = function() {
   //Collision checks
     //heart
     heartCollisionDetection(link.xMove, link.yMove, heart.x, heart.y, heart);
+    //big heart
+    heartCollisionDetection(link.xMove, link.yMove, bigHeart.x, bigHeart.y, bigHeart);
     //tektite
     enemyCollisionDetection(link.xMove, link.yMove, tektite.xMove, tektite.yMove, tektite);
     //keese
@@ -1730,6 +1795,16 @@ var animationLoop = function() {
     enemyCollisionDetection(link.xMove, link.yMove, aquamentus.xMove, aquamentus.yMove, aquamentus);
     //moblin
     enemyCollisionDetection(link.xMove, link.yMove, moblin.xMove, moblin.yMove, moblin);
+
+
+    //Array of live enemies
+    liveEnemies = allEnemies.filter(function(baddy) {
+      return baddy.dead === false;
+    });
+    //true if all enemies dead; false if enemies alive
+    areEnemiesDead = function() {
+      return liveEnemies.length > 0 ? false : true;
+    };
 
 
   //Updates score, high score, level, and kills to advance

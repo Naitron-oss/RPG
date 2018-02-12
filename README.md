@@ -108,8 +108,9 @@ Step 23:
 Continuous mode or win mode with boss
 -~-COMPLETE
 
-Step ??:
-Add ___ bad guys????
+Step 24:
+Add 10 total bad guys with indiviual AI
+-~-COMPLETE
 
 Step ??:
 Add a place to enter players name
