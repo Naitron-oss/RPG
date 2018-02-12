@@ -119,7 +119,7 @@ var background = {
     if (link.life <= 3) {
       heart.show = true;
     };
-    if (link.life <= 1 || game.level === 10) {
+    if (link.life <= 1 || game.level >= 10 && game.level % 5 === 0) {
       bigHeart.show = true;
     };
   },
@@ -149,7 +149,7 @@ var background = {
     if (link.life <= 3) {
       heart.show = true;
     };
-    if (link.life <= 1 || game.level === 10) {
+    if (link.life <= 1 || game.level >= 10 && game.level % 5 === 0) {
       bigHeart.show = true;
     };
   },
@@ -179,7 +179,7 @@ var background = {
     if (link.life <= 3) {
       heart.show = true;
     };
-    if (link.life <= 1 || game.level === 10) {
+    if (link.life <= 1 || game.level >= 10 && game.level % 5 === 0) {
       bigHeart.show = true;
     };
   },
@@ -209,7 +209,7 @@ var background = {
     if (link.life <= 3) {
       heart.show = true;
     };
-    if (link.life <= 1 || game.level === 10) {
+    if (link.life <= 1 || game.level >= 10 && game.level % 5 === 0) {
       bigHeart.show = true;
     };
   }
@@ -763,7 +763,7 @@ var darknut = {
   maxLife: 1,  //how much starting life
   strength: 2.5,  //how much life taken per hit to link
   dead: true,  //tracks if dead or not
-  points: 3,  //how many points killing darknut is worth
+  points: 4,  //how many points killing darknut is worth
   levelShowUp: 8,  //first level seen
 
   moveDarknut: function() {
@@ -854,7 +854,7 @@ var moblin = {
   maxLife: 6,  //how much starting life
   strength: 1,  //how much life taken per hit to link
   dead: true,  //tracks if dead or not
-  points: 1,  //how many points killing moblin is worth
+  points: 5,  //how many points killing moblin is worth
   levelShowUp: 10,  //first level seen
 
   moveMoblin: function() {
