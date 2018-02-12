@@ -5,6 +5,7 @@ var game = {
   over: true,  //tracks game over or not
   continuous: false,  //tracks continous or boss mode
   score: 0,  //tracks current kill score
+  highScore: 0,  //tracks high score
   level: 1,  //which level player is on
   needToKill: 1,  //tracks how many enemies link needs to kill to progress
   now: null,  //current game time
@@ -16,21 +17,6 @@ var game = {
   setGameNow: function() {  //sets game time
     game.now = Date.now();
   },
-
-//found online, thanks to Dan Tello
-  // frame: function() {
-  //   game.setDelta();
-  //   // game.update();
-  //   // game.render();
-  //   game.animationFrame = window.requestAnimationFrame(game.frame);
-  // },
-
-  // setDelta: function() {
-  //   game.now = Date.now();
-  //   game.delta = (game.now - game.then) / 1000; //seconds since last frame
-  //   game.then = game.now;
-  // },
-
 
   //sets kills required to pass level
   setNeedToKill: function() {
@@ -122,7 +108,10 @@ var background = {
     game.level += 1;
     game.setNeedToKill();
     allEnemies.forEach(function(baddy) {
-      if (baddy.dead && game.level >= baddy.levelShowUp) {
+      if (baddy !== moblin && baddy.dead && game.level >= baddy.levelShowUp) {
+        baddy.dead = false;
+        baddy.life = baddy.maxLife;
+      } else if (baddy === moblin && baddy.dead && game.level >= baddy.levelShowUp && game.level % 5 === 0) {
         baddy.dead = false;
         baddy.life = baddy.maxLife;
       };
@@ -149,7 +138,10 @@ var background = {
     game.level += 1;
     game.setNeedToKill();
     allEnemies.forEach(function(baddy) {
-      if (baddy.dead && game.level >= baddy.levelShowUp) {
+      if (baddy !== moblin && baddy.dead && game.level >= baddy.levelShowUp) {
+        baddy.dead = false;
+        baddy.life = baddy.maxLife;
+      } else if (baddy === moblin && baddy.dead && game.level >= baddy.levelShowUp && game.level % 5 === 0) {
         baddy.dead = false;
         baddy.life = baddy.maxLife;
       };
@@ -176,7 +168,10 @@ var background = {
     game.level += 1;
     game.setNeedToKill();
     allEnemies.forEach(function(baddy) {
-      if (baddy.dead && game.level >= baddy.levelShowUp) {
+      if (baddy !== moblin && baddy.dead && game.level >= baddy.levelShowUp) {
+        baddy.dead = false;
+        baddy.life = baddy.maxLife;
+      } else if (baddy === moblin && baddy.dead && game.level >= baddy.levelShowUp && game.level % 5 === 0) {
         baddy.dead = false;
         baddy.life = baddy.maxLife;
       };
@@ -203,7 +198,10 @@ var background = {
     game.level += 1;
     game.setNeedToKill();
     allEnemies.forEach(function(baddy) {
-      if (baddy.dead && game.level >= baddy.levelShowUp) {
+      if (baddy !== moblin && baddy.dead && game.level >= baddy.levelShowUp) {
+        baddy.dead = false;
+        baddy.life = baddy.maxLife;
+      } else if (baddy === moblin && baddy.dead && game.level >= baddy.levelShowUp && game.level % 5 === 0) {
         baddy.dead = false;
         baddy.life = baddy.maxLife;
       };
@@ -1001,7 +999,7 @@ var moblin = {
           this.yMove = 140;
         }
       };
-    } else if (this.life <= 0 && !game.continous) {
+    } else if (this.life <= 0 && !game.continuous) {
       game.win
     };
   }
@@ -1227,7 +1225,7 @@ var link = {
     };
   },
 
-  //Player move Function
+  //Player keyboard actions
   playerAction: function(event) {
     //Up
     if (event.keyCode === 38 && !game.over && !game.win) {
@@ -1375,6 +1373,169 @@ var link = {
           break;
       };
     };
+  },
+
+  touchUp: function() {
+    if (!game.over && !game.win) {
+      if (!link.isMovingUp && !link.isMoving && !link.isAttacking && link.yMove >= 1) {
+          link.isMovingUp = true;
+          link.isMoving = true;
+      };
+    }
+  },
+
+  touchDown: function() {
+    if (!game.over && !game.win) {
+      if (!link.isMovingDown && !link.isMoving && !link.isAttacking && link.yMove <= 317) {
+          link.isMovingDown = true;
+          link.isMoving = true;
+        };
+    }
+  },
+
+  touchLeft: function() {
+    if (!game.over && !game.win) {
+      if (!link.isMovingLeft && !link.isMoving && !link.isAttacking && link.xMove >= 0) {
+          link.isMovingLeft = true;
+          link.isMoving = true;
+        };
+    }
+  },
+
+  touchRight: function() {
+    if (!game.over && !game.win) {
+      if (!link.isMovingRight && !link.isMoving && !link.isAttacking && link.xMove <= 479) {
+          link.isMovingRight = true;
+          link.isMoving = true;
+        };
+    }
+  },
+
+  touchAttack: function() {
+    if (!game.over && !game.win) {
+      switch(true) {
+        //if facing up
+        case link.xFrame === 61:
+          link.xFrame = 60;
+          link.pngHeight = 28;
+          link.spriteHeight = 59.5;
+          link.yFrame = 84;
+          link.yMove -= 29;
+          link.isMovingUp = false;
+          link.isMoving = false;
+          link.isAttacking = true;
+          break;
+          //if facing down
+        case link.xFrame === 0:
+          link.pngWidth = 16;
+          link.pngHeight = 28;
+          link.spriteHeight = 59.5;
+          link.yFrame = 84;
+          link.yMove += 3;
+          link.isMovingDown = false;
+          link.isMoving = false;
+          link.isAttacking = true;
+          break;
+          //if facing left
+        case link.xFrame === 29:
+          link.xFrame = 24;
+          link.pngWidth = 28;
+          link.spriteWidth = 59.5;
+          link.yFrame = 90;
+          link.xMove -= 30;
+          link.isMovingLeft = false;
+          link.isMoving = false;
+          link.isAttacking = true;
+          break;
+          //if facing right
+        case link.xFrame === 90:
+          link.xFrame = 84;
+          link.pngWidth = 28;
+          link.spriteWidth = 59.5;
+          link.yFrame = 90;
+          link.xMove += 6;
+          link.isMovingRight = false;
+          link.isMoving = false;
+          link.isAttacking = true;
+          break;
+      };
+    };
+  },
+
+  touchUpStop: function() {
+    if(!game.over && !game.win) {
+      link.isMovingUp = false;
+      link.isMoving = false;
+      link.yFrame = 30;
+    };
+  },
+
+  touchDownStop: function() {
+    if(!game.over && !game.win) {
+      link.isMovingDown = false;
+      link.isMoving = false;
+      link.yFrame = 0;
+    };
+  },
+
+  touchLeftStop: function() {
+    if(!game.over && !game.win) {
+      link.isMovingLeft = false;
+      link.isMoving = false;
+      link.yFrame = 0;
+    };
+  },
+
+  touchRightStop: function() {
+    if(!game.over && !game.win) {
+      link.isMovingRight = false;
+      link.isMoving = false;
+      link.yFrame = 31;
+    };
+  },
+
+  touchAttackStop: function() {
+    if (!game.over && !game.win) {
+      switch(true) {
+        //if facing up
+        case link.xFrame === 60:
+          link.xFrame = 61;
+          link.pngHeight = 16;
+          link.spriteHeight = 34;
+          link.yFrame = 30;
+          link.yMove += 29;
+          link.isAttacking = false;
+          break;
+          //if facing down
+        case link.xFrame === 0:
+          link.pngWidth = 15;
+          link.pngHeight = 16;
+          link.spriteHeight = 34;
+          link.yFrame = 0;
+          link.yMove -= 3;
+          link.isAttacking = false;
+          break;
+          //if facing left
+        case link.xFrame === 24:
+          link.xFrame = 29;
+          link.pngWidth = 15;
+          link.spriteWidth = 31.875;
+          link.yFrame = 0;
+          link.xMove += 30;
+          link.isAttacking = false;
+          break;
+          link.yFrame = 100;
+          //if facing right
+        case link.xFrame === 84:
+          link.xFrame = 90;
+          link.pngWidth = 15;
+          link.spriteWidth = 31.875;
+          link.yFrame = 31;
+          link.xMove -= 6;
+          link.isAttacking = false;
+          break;
+      };
+    };
   }
 };
 
@@ -1407,6 +1568,10 @@ var enemyCollisionDetection = function(x1, y1, x2, y2, enemy) {
     if (hitRadius <= 32 || hitRadiusRight <= 32 || hitRadiusDown <= 32) {
       link.linkAttack();
       enemy.life -= 1;
+      var hitEnemy = new Audio('hit-enemy.wav');
+      if (!enemy.dead && game.soundFx) {
+        hitEnemy.play()
+      };
       if (enemy.life === 0) {
         enemy.dead = true;
         if (game.soundFx && enemy.type !== 'boss') {
@@ -1623,14 +1788,16 @@ var animationLoop = function() {
     game.over = true;
   };
 
-  if (!game.continous && game.level >= 10 && moblin.life <= 0) {
+  game.continuous = $('#continuous-play').prop('checked');
+
+
+  if (!game.continuous && game.level >= 10 && moblin.life <= 0) {
     game.win = true;
   };
 
   if (!game.over && !game.win) {
     game.setGameNow();
     game.soundFx = $('#soundFx').prop('checked');
-    game.continue = $('#continuous-play').prop('checked');
 
 
     ctxEnemyMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
@@ -1808,10 +1975,13 @@ var animationLoop = function() {
 
 
   //Updates score, high score, level, and kills to advance
-    $('#score-num').html(game.score);
+    if (game.score > game.highScore) {
+      game.highScore = game.score;
+      localStorage.highScore = game.highScore;
+    };
     $('#game-num').html(game.level);
-    $('#kills-num').html(game.needToKill);
-    //$('#high-score').html()
+    $('#score-num').html(game.score);
+    $('#high-score').html(game.highScore);
 
     animateGame = requestAnimationFrame(animationLoop);
 
@@ -1856,6 +2026,9 @@ var startGame = function() {
     deathCanvas.style.opacity = '0';
     ctxBackgroundMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
     ctxExplosionCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
+    ctxDeathCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
+    ctxWinCanvas.clearRect(0, 0, enemyMap.width, enemyMap.height);
+    ctxEnemyMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
     ctxSpriteMap.clearRect(0, 0, enemyMap.width, enemyMap.height);
     backgroundMap.classList.remove('canvas-blur');
     enemyMap.classList.remove('canvas-blur');
@@ -1921,11 +2094,30 @@ var titleScreenLoop = function () {
   titleScreen = requestAnimationFrame(titleScreenLoop);
 };
 
+//Load high score
+var getHighScore = function() {
+  if(localStorage.hasOwnProperty('highScore')) {
+    game.highScore = localStorage.highScore;
+  };
+};
+
 //Document ready function for DOM events
 document.addEventListener('DOMContentLoaded', function(event) {
   titleScreenLoop();
+  getHighScore();
+  $('#high-score').text(game.highScore);
   startGameButton.on('click', startGame);
   window.addEventListener('keydown', link.playerAction);
   window.addEventListener('keyup', link.actionStop);
+  $('#up').on('touchstart', link.touchUp);
+  $('#down').on('touchstart', link.touchDown);
+  $('#left').on('touchstart', link.touchLeft);
+  $('#right').on('touchstart', link.touchRight);
+  $('#attack').on('touchstart', link.touchAttack);
+  $('#up').on('touchend', link.touchUpStop);
+  $('#down').on('touchend', link.touchDownStop);
+  $('#left').on('touchend', link.touchLeftStop);
+  $('#right').on('touchend', link.touchRightStop);
+  $('#attack').on('touchend', link.touchAttackStop);
 
 });

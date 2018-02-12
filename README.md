@@ -112,13 +112,21 @@ Step 24:
 Add 10 total bad guys with indiviual AI
 -~-COMPLETE
 
-Step ??:
-Add a place to enter players name
+Step 25:
+Add big heart to refill all hearts
+-~-COMPLETE
 
-Step ??:
-Add local storage to store players name and high score
+Step 26:
+Add touch buttons for mobile
+-~-COMPLETE...kinda...responsive issues for scaling
+
+Step 27:
+Add local storage for high score
 
 ==========
+Step ??:
+Add a place to enter players name
+-~-SCRATCHED...bootstrap not playing nice with canvas caused responsive issues and so coulnd't find room for name input
 
 Step ??:
 Make map key where Link and enemies can/can't be on
@@ -126,4 +134,4 @@ Also include tiles that trigger map/dungeon frame moves
 //Each map frame is 256x176 ratio
 //Each map frame has 16 tiles on x axis, and 11 tiles on y axis
 //Each tile is 16x16
--~-SCRATCHED...WENT ANOTHER DIRECTION WITH GAME
+-~-SCRATCHED...went another direction with game

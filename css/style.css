@@ -52,16 +52,92 @@ body {
   margin: 10px;
 }
 
-#player-name {
-  font-weight: bold;
-}
-
 #game-num {
   font-weight: bold;
 }
 
 #score-num {
   font-weight: bold;
+}
+
+.mobile {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobile {
+    display: block;
+  }
+}
+
+.d-pad {
+  position: absolute;
+  left: 135px;
+  bottom: 100px;
+  height: 130px;
+  width: 125px;
+  border-radius: 10px;
+  background: #3c293a;
+  opacity: .5;
+  box-shadow: 0 0 5px 1px #36c792;
+}
+
+.d-pad-arrow {
+  height: 41.25px;
+  width: 41.25px;
+  background: #36c792;
+  opacity: 1;
+  box-shadow: 0 -4px #195942;
+}
+
+#up {
+  position: relative;
+  top: 5px;
+  left: 41.67px;
+  border-radius: 8px 8px 0 0;
+}
+
+#left {
+  position: relative;
+  top: 5px;
+  border-radius: 8px 0 0 8px;
+}
+
+#down {
+  position: relative;
+  top: 5px;
+  left: 41.67px;
+  border-radius: 0 0 8px 8px;
+}
+
+#right {
+  position: relative;
+  top: -78.33px;
+  left: 83.33px;
+  border-radius: 0 8px 8px 0;
+}
+
+#attack-box {
+  position: absolute;
+  right: 135px;
+  bottom: 100px;
+  height: 92px;
+  width: 92px;
+  border-radius: 46px;
+  background: #36c792;
+  opacity: .5;
+  box-shadow: 0 0 15px 5px inset, 0 0 5px 1px #9acfbb;
+}
+
+#attack {
+  position: relative;
+  top: 15px;
+  left: 15px;
+  height: 61.33px;
+  width: 61.33px;
+  border-radius: 30px;
+  background: #3c293a;
+  box-shadow: 0 0 5px 5px;
 }
 
 .canvas-div {
