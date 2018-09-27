@@ -1,5 +1,6 @@
 # Welcome to The Legend of Tiny, Pixelated, 1980's Man!
 *locally saved as Top-Down-RPG-Game*
+Live site: https://scoroc.github.io/Top-Down-RPG-Game/
 
 This is a top down style game where you need to battle enemies per "level." Each "level" is a map screen. On each map screen you must kill all visible enemies before moving on. There are 9 total enemies and a boss. Each enemy has a different custom AI. On normal mode, once you defeat the boss on level 10 the game is over and you win. On continuous mode, there is no winning and you keep playing until you die, with the boss spawning every 5 levels after level 10.
 
